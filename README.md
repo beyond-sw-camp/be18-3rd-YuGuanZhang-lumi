@@ -1,1 +1,0 @@
-# be18-3rd-3team-project
