@@ -12,7 +12,14 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    VueRouter(),
+    VueRouter({
+      logs: true,
+      routesFolder: [
+        {
+          src: 'src/pages',
+        },
+      ],
+    }),
     Vue({
       template: { transformAssetUrls },
     }),
