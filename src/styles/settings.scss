@@ -5,11 +5,13 @@
  */
 
 // https://vuetifyjs.com/features/sass-variables/`
-// @use 'vuetify/settings' with (
-//   $color-pack: false
-// );
-
 @use 'vuetify/settings' with (
+  $color-pack: false,
   $body-font-family: 'Noto Sans KR, sans-serif',
   $heading-font-family: 'Noto Sans KR, sans-serif'
 );
+
+body {
+  margin: 0;
+  padding: 0;
+}
