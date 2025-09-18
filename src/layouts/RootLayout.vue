@@ -33,7 +33,7 @@
       </div>
     </template>
   </v-navigation-drawer>
-  <v-app-bar class="bg-primary-lighten-1" elevation="0">
+  <v-app-bar class="bg-primary-lighten-1" flat>
     <!-- 채널명 필요 -->
     <v-spacer />
     <v-btn variant="plain"> 사용자 이름 </v-btn>
@@ -41,12 +41,10 @@
     <v-btn icon><v-icon>mdi-cog</v-icon></v-btn>
   </v-app-bar>
 
-  <v-main class="d-flex align-center justify-center">
-    <v-container class="fill-height w-100" fluid>
-      <v-sheet class="root-content rounded-xl fill-height w-100">
-        <slot />
-      </v-sheet>
-    </v-container>
+  <v-main class="pa-4">
+    <v-sheet class="custom-sheet">
+      <slot />
+    </v-sheet>
   </v-main>
 </template>
 <script setup></script>
@@ -58,8 +56,12 @@
   background-color: rgb(var(--v-theme-primary)) !important;
   color: white !important;
 }
-.sub-layout {
-  border: 1px solid rgba(0, 0, 0, 0.12) !important; /* 확실히 적용 */
-  background-color: #fff;
+.custom-sheet {
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  box-sizing: border-box;
+  margin: 20px;
 }
 </style>
