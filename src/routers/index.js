@@ -17,7 +17,7 @@ const routes = [
   { path: '/signup', component: Signup },
   { path: '/channels', component: () => import('@/pages/channel') },
   { path: '/calender', component: () => import('@/pages/calender') },
-  { path: '/chat', component: () => import('@/pages/chat') },
+  { path: '/chats', component: () => import('@/pages/chat') },
   { path: '/setting', component: () => import('@/pages/setting') },
   { path: '/channels/:channelId/classes', component: () => import('@/pages/class') },
   { path: '/channels/:channelId/assignments', component: () => import('@/pages/assignment') },
