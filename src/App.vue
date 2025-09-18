@@ -1,24 +1,28 @@
 <template>
-  <v-card>
+  <v-app class="bg-primary-lighten-1">
     <v-layout class="rounded rounded-md border">
-      <SideNavigation v-if="isLogin"></SideNavigation>
-      <AppHeader />
+      <SideNavigation v-if="isLogin" app />
+      <AppHeader app class="bg-primary-lighten-1" />
       <v-main class="d-flex align-center justify-center">
-        <router-view />
+        <SubLayout>
+          <router-view />
+        </SubLayout>
       </v-main>
     </v-layout>
-  </v-card>
+  </v-app>
 </template>
 
 <script>
 import AppHeader from '@/layouts/AppHeader.vue';
 import SideNavigation from '@/layouts/SideNavigation.vue';
+import SubLayout from '@/layouts/SubLayout.vue';
 
 export default {
   name: 'App',
   components: {
     SideNavigation,
     AppHeader,
+    SubLayout,
   },
   computed: {
     isLogin() {

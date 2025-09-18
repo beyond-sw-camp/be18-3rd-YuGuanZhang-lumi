@@ -11,12 +11,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
 
+
 const routes = [
   { path: '/', redirect: '/channels' },
   { path: '/login', component: Login },
   { path: '/signup', component: Signup },
-  { path: '/channels', component: () => import('@/pages/channel') },
-  { path: '/calender', component: () => import('@/pages/calender') },
+  { path: '/channels', component: () => import('@/pages/channel')},
+  { path: '/calendar', component: () => import('@/pages/calender') },
   { path: '/chats', component: () => import('@/pages/chat') },
   { path: '/setting', component: () => import('@/pages/setting') },
   { path: '/channels/:channelId/classes', component: () => import('@/pages/class') },
