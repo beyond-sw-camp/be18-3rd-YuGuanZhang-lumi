@@ -33,6 +33,21 @@
       </div>
     </template>
   </v-navigation-drawer>
+  <v-app-bar class="bg-primary-lighten-1" elevation="0">
+    <!-- 채널명 필요 -->
+    <v-spacer />
+    <v-btn variant="plain"> 사용자 이름 </v-btn>
+    <v-btn variant="plain"> 로그아웃 </v-btn>
+    <v-btn icon><v-icon>mdi-cog</v-icon></v-btn>
+  </v-app-bar>
+
+  <v-main class="d-flex align-center justify-center">
+    <v-container class="fill-height w-100" fluid>
+      <v-sheet class="root-content rounded-xl fill-height w-100">
+        <slot />
+      </v-sheet>
+    </v-container>
+  </v-main>
 </template>
 <script setup></script>
 
@@ -41,9 +56,10 @@
 .v-navigation-drawer .v-list,
 .v-navigation-drawer .v-list-item {
   background-color: rgb(var(--v-theme-primary)) !important;
-  color: white !important; // 글씨 색상 대비
+  color: white !important;
 }
-// .v-list-item--active {
-//   background-color: rgba(255, 255, 255, 0.2) !important; // 활성화 시 강조 효과
-// }
+.sub-layout {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important; /* 확실히 적용 */
+  background-color: #fff;
+}
 </style>

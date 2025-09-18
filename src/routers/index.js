@@ -7,32 +7,51 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router';
 
-// import Layout from '@/layouts/Layout';
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
 
-
 const routes = [
   { path: '/', redirect: '/channels' },
-  { path: '/login', component: Login },
-  { path: '/signup', component: Signup },
-  { path: '/channels', component: () => import('@/pages/channel')},
-  { path: '/calendar', component: () => import('@/pages/calender') },
-  { path: '/chats', component: () => import('@/pages/chat') },
-  { path: '/setting', component: () => import('@/pages/setting') },
-  { path: '/channels/:channelId/classes', component: () => import('@/pages/class') },
-  { path: '/channels/:channelId/assignments', component: () => import('@/pages/assignment') },
-  // { path: '/channels/:channelId/assignments/new', component:  }, 등록
-  // { path: '/channels/:channelId/assignments/:assignmentId/edit', component:  }, 수정
-  // { path: '/channels/:channelId/assignment/:assignmentId', component: }, 단일 조회
-  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component:  }, 등록
-  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/:submissionId/edit', component:  }, 수정(학생)
-  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: Submission }, 제출(학생)
-  { path: '/channels/:channelId/materials', component: () => import('@/pages/material') },
-  // { path: '/channels/:channelId/materials/new', component:  }, 등록
-  // { path: '/channels/:channelId/materials/:materialId/edit', component:  }, 수정
-  // { path: '/channels/:channelId/materials/:materialId', component:  }, 단일 조회
-  { path: '/channels/:channelId/participants', component: () => import('@/pages/participant') },
+  { path: '/login', component: Login, meta: { layout: 'blank' } },
+  { path: '/signup', component: Signup, meta: { layout: 'blank' } },
+  { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
+  { path: '/calendar', component: () => import('@/pages/calender'), meta: { layout: 'root' } },
+  { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
+  { path: '/setting', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
+  {
+    path: '/channels/:channelId/classes',
+    component: () => import('@/pages/class'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  },
+  {
+    path: '/channels/:channelId/assignments',
+    component: () => import('@/pages/assignment'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  },
+  // { path: '/channels/:channelId/assignments/new', component: ,meta: { layout: 'root', subLayout: 'sublayout' }, }, 등록
+  // { path: '/channels/:channelId/assignments/:assignmentId/edit', component: ,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 수정
+  // { path: '/channels/:channelId/assignment/:assignmentId', component: ,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 단일 조회
+  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: ,   meta: { layout: 'root', subLayout: 'sublayout' }, }, 등록
+  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/:submissionId/edit', component:  , meta: { layout: 'root', subLayout: 'sublayout' }, }, 수정(학생)
+  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: Submission,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 제출(학생)
+  {
+    path: '/channels/:channelId/materials',
+    component: () => import('@/pages/material'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  },
+  // { path: '/channels/:channelId/materials/new', component: ,meta: { layout: 'root', subLayout: 'sublayout' }, }, 등록
+  // { path: '/channels/:channelId/materials/:materialId/edit', component: , meta: { layout: 'root', subLayout: 'sublayout' }, }, 수정
+  // { path: '/channels/:channelId/materials/:materialId', component: , meta: { layout: 'root', subLayout: 'sublayout' }, }, 단일 조회
+  {
+    path: '/channels/:channelId/scores',
+    component: () => import('@/pages/score'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  },
+  {
+    path: '/channels/:channelId/participants',
+    component: () => import('@/pages/participant'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  },
 ];
 
 const router = createRouter({

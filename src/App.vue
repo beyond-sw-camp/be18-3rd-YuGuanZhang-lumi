@@ -1,33 +1,39 @@
 <template>
   <v-app class="bg-primary-lighten-1">
     <v-layout class="rounded rounded-md border">
-      <SideNavigation v-if="isLogin" app />
-      <AppHeader app class="bg-primary-lighten-1" />
-      <v-main class="d-flex align-center justify-center">
-        <SubLayout>
+      <component :is="layout">
+        <component :is="subLayout">
           <router-view />
-        </SubLayout>
-      </v-main>
+        </component>
+      </component>
     </v-layout>
   </v-app>
 </template>
 
 <script>
-import AppHeader from '@/layouts/AppHeader.vue';
-import SideNavigation from '@/layouts/SideNavigation.vue';
-import SubLayout from '@/layouts/SubLayout.vue';
+import BlankLayout from '@/layouts/BlankLayout.vue';
+import RootLayout from '@/layouts/RootLayout.vue';
+import Tab from '@/layouts/Tab.vue';
 
 export default {
   name: 'App',
-  components: {
-    SideNavigation,
-    AppHeader,
-    SubLayout,
-  },
   computed: {
-    isLogin() {
-      // 로그인 로직 추가
-      return true;
+    layout() {
+      switch (this.$route.meta.layout) {
+        case 'root': {
+          return RootLayout;
+        }
+        case 'blank': {
+          return BlankLayout;
+        }
+        default: {
+          return BlankLayout;
+        }
+      }
+    },
+    subLayout() {
+      if (this.$route.meta.subLayout === 'sublayout') return Tab;
+      return BlankLayout;
     },
   },
 };
