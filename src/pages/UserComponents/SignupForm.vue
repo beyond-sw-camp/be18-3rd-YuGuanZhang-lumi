@@ -89,10 +89,10 @@ const passwordMatch = computed(
     formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm,
 )
 
-const emit = defineEmits(['form-submit'])
+const emit = defineEmits(['switch-to-login'])
 
 function goBack() {
-  window.history.back()
+  emit('switch-to-login')
 }
 
 async function sendEmail() {
@@ -139,6 +139,9 @@ async function signUp() {
       isPrivacyAgreement: formData.agree,
     })
     alert('회원가입 성공했습니다.')
+
+    emit('switch-to-login')
+
     console.log(response.data)
   } catch (error) {
     console.error(error)

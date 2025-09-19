@@ -18,7 +18,7 @@
               <div style="margin-bottom: 12px; font-size: 12px; color: #555; text-align: center">
                 서비스 이용을 위해 아래 정보를 입력해주세요.
               </div>
-              <SignupForm />
+              <SignupForm @switch-to-login="isSignUpActive = false" />
             </v-card-text>
           </v-card>
 
@@ -58,7 +58,7 @@ function toggleForm() {
 .card-container {
   position: relative;
   width: 100%;
-  min-height: 480px;
+  min-height: 600px;
   overflow: hidden;
   background-color: #eeddff;
 }
@@ -74,7 +74,7 @@ function toggleForm() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 60px;
 }
 
 /* 로그인 카드 */
