@@ -19,8 +19,18 @@
           type="text"
           variant="outlined"
         />
+        <div
+          v-if="formData.email"
+          :style="{
+            color: emailValid ? 'green' : 'red',
+            marginTop: '6px',
+            marginBottom: '12px',
+            fontWeight: 'bold',
+          }"
+        >
+          올바른 이메일 형식을 입력하세요.
+        </div>
       </v-col>
-
       <v-col class="d-flex" cols="4">
         <v-btn block color="#eeddff" style="height: 50px; margin-left: 8px" @click="sendEmail">
           인증 전송
@@ -32,10 +42,17 @@
       v-model="formData.password"
       label="비밀번호를 입력해주세요."
       required
-      style="width: 100%; height: 50px; margin-top: 12px; margin-bottom: 12px"
+      style="width: 100%; height: 50px; margin-top: 12px; margin-bottom: 6px"
       type="password"
       variant="outlined"
     />
+
+    <div
+      v-if="formData.password"
+      :style="{ color: passwordValid ? 'green' : 'red', marginBottom: '12px', fontWeight: 'bold' }"
+    >
+      비밀번호는 8자 이상, 영문/숫자/특수문자를 모두 포함해야 합니다.
+    </div>
 
     <v-text-field
       v-model="formData.passwordConfirm"
@@ -64,7 +81,6 @@
       <v-btn color="#eeddff" style="height: 50px; width: 48%; font-weight: bold" @click="goBack">
         뒤로가기
       </v-btn>
-
       <v-btn color="#eeddff" style="height: 50px; width: 48%; font-weight: bold" @click="signUp">
         회원가입 완료
       </v-btn>
@@ -73,8 +89,8 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { reactive, toRaw, computed } from 'vue'
+import axios from 'axios';
+import { reactive, toRaw, computed, ref } from 'vue';
 
 const formData = reactive({
   name: '',
@@ -82,76 +98,70 @@ const formData = reactive({
   password: '',
   passwordConfirm: '',
   agree: false,
-})
+});
+
+const passwordError = ref('');
+
+const emailValid = computed(() => {
+  const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
+  return regex.test(formData.email);
+});
+
+const passwordValid = computed(() => {
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+  return regex.test(formData.password);
+});
 
 const passwordMatch = computed(
   () =>
     formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm,
-)
+);
 
-const emit = defineEmits(['switch-to-login'])
+const emit = defineEmits(['switch-to-login']);
 
 function goBack() {
-  emit('switch-to-login')
+  emit('switch-to-login');
 }
 
 async function sendEmail() {
-  console.log('sendEmail 호출됨', formData.email)
   if (!formData.email) {
-    alert('이메일을 입력해주세요.')
-    return
+    alert('이메일을 입력해주세요.');
+    return;
   }
   try {
-    const response = await axios.post('http://localhost:8080/api/email/send', {
-      email: formData.email,
-    })
-    alert('이메일 인증 코드가 전송되었습니다.')
-    console.log(response.data)
+    await axios.post('http://localhost:8080/api/email/send', { email: formData.email });
+    alert('이메일 인증 코드가 전송되었습니다.');
   } catch (error) {
-    console.error(error)
-    alert('이메일 전송에 실패했습니다.')
+    alert('이메일 전송에 실패했습니다.');
   }
 }
 
 async function signUp() {
-  console.log('회원가입 호출', formData.name, formData.email, formData.password, formData.agree)
-  if (!formData.name) {
-    alert('이름을 입력해주세요.')
-    return
-  }
-  if (!formData.email) {
-    alert('이메일을 입력해주세요.')
-    return
-  }
-  if (!formData.password) {
-    alert('비밀번호를 입력해주세요.')
-    return
-  }
-  if (!formData.agree) {
-    alert('개인정보 및 이용 동의를 수락해주세요.')
-    return
-  }
+  if (!formData.name) return alert('이름을 입력해주세요.');
+  if (!formData.email) return alert('이메일을 입력해주세요.');
+  if (!formData.password) return alert('비밀번호를 입력해주세요.');
+  if (!formData.agree) return alert('개인정보 및 이용 동의를 수락해주세요.');
+
   try {
     const response = await axios.post('http://localhost:8080/api/sign-up', {
       name: formData.name,
       email: formData.email,
       password: formData.password,
       isPrivacyAgreement: formData.agree,
-    })
-    alert('회원가입 성공했습니다.')
-
-    emit('switch-to-login')
-
-    console.log(response.data)
+    });
+    alert('회원가입 성공했습니다.');
+    ``;
+    emit('switch-to-login');
   } catch (error) {
-    console.error(error)
-    alert('회원가입 실패했습니다.')
+    if (error.response && error.response.data) {
+      alert(error.response.data.message);
+    } else {
+      passwordError.value = '회원가입 실패했습니다.';
+    }
   }
 }
 
 function submitClick() {
-  emit('form-submit', toRaw(formData))
+  emit('form-submit', toRaw(formData));
 }
 </script>
-
-<style lang="scss" scoped></style>
