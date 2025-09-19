@@ -4,40 +4,40 @@
       v-model="formData.email"
       label="Email"
       required
+      style="width: 400px; height: 60px"
       type="text"
       variant="outlined"
-      style="width: 400px; height: 60px"
     />
     <v-text-field
       v-model="formData.password"
+      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
       label="Password"
       required
+      style="width: 400px; height: 60px"
       :type="showPassword ? 'text' : 'password'"
       variant="outlined"
-      :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
       @click:append-inner="togglePassword"
-      style="width: 400px; height: 60px"
     />
     <v-btn block color="deep-purple " type="submit">로그인</v-btn>
   </v-form>
 </template>
 
 <script setup>
-import { ref, reactive, toRaw } from 'vue'
+  import { reactive, ref, toRaw } from 'vue'
 
-const formData = reactive({
-  email: '',
-  password: '',
-})
+  const formData = reactive({
+    email: '',
+    password: '',
+  })
 
-const emit = defineEmits(['form-submit'])
+  const emit = defineEmits(['form-submit'])
 
-const showPassword = ref(false)
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
+  const showPassword = ref(false)
+  function togglePassword () {
+    showPassword.value = !showPassword.value
+  }
 
-const submitClick = () => {
-  emit('form-submit', toRaw(formData))
-}
+  function submitClick () {
+    emit('form-submit', toRaw(formData))
+  }
 </script>

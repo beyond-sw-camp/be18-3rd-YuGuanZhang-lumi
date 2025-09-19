@@ -1,6 +1,6 @@
 <template>
   <v-container class="login-page" fluid>
-    <v-row align="center" justify="center" class="fill-height">
+    <v-row align="center" class="fill-height" justify="center">
       <v-col cols="12" md="8">
         <v-card class="card-container" elevation="10">
           <!-- 로그인 폼 -->
@@ -26,7 +26,7 @@
           <div class="overlay" :class="{ 'right-active': isSignUpActive }">
             <div class="overlay-panel">
               <h1>회원가입</h1>
-              <v-btn outlined color="white" @click="toggleForm">회원가입</v-btn>
+              <v-btn color="white" outlined @click="toggleForm">회원가입</v-btn>
             </div>
           </div>
         </v-card>
@@ -37,12 +37,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import LoginForm from './LoginComponents/LoginForm.vue'
-import SignupForm from './LoginComponents/SignupForm.vue'
+import LoginForm from './UserComponents/LoginForm.vue'
+import SignupForm from './UserComponents/SignupForm.vue'
 
 const isSignUpActive = ref(false)
 
-const toggleForm = () => {
+function toggleForm() {
   isSignUpActive.value = !isSignUpActive.value
 }
 </script>
