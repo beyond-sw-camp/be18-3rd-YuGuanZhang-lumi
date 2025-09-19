@@ -37,8 +37,8 @@
 
 <script setup>
 import { ref } from 'vue';
-import LoginForm from './login/components/LoginForm.vue';
-import SignupForm from './login/components/SignupForm.vue';
+import LoginForm from './components/LoginForm.vue';
+import SignupForm from './components/SignupForm.vue';
 
 const isSignUpActive = ref(false);
 
