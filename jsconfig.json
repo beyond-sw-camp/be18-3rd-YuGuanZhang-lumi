@@ -9,5 +9,6 @@
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
-  }
+  },
+  "exclude": ["typed-router.d.ts"]
 }
