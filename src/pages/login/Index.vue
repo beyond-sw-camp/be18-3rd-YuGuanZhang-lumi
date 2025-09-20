@@ -24,8 +24,9 @@
 
           <!-- 오버레이 -->
           <div class="overlay" :class="{ 'right-active': isSignUpActive }">
+            <div class="overlay-bg"></div>
             <div class="overlay-panel">
-              <h1>회원가입</h1>
+              <h1>Sign up</h1>
               <v-btn color="white" outlined @click="toggleForm">회원가입</v-btn>
             </div>
           </div>
@@ -39,7 +40,6 @@
 import { ref } from 'vue';
 import LoginForm from './components/LoginForm.vue';
 import SignupForm from './components/SignupForm.vue';
-
 const isSignUpActive = ref(false);
 
 function toggleForm() {
@@ -49,10 +49,28 @@ function toggleForm() {
 
 <style scoped lang="scss">
 .login-page {
+  position: relative;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: none;
+  z-index: 1;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('@/assets/image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.7; /* 투명도 조절 */
 }
 
 .card-container {
@@ -104,6 +122,14 @@ function toggleForm() {
   pointer-events: auto;
 }
 
+.form-card .v-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 /* 오버레이 */
 .overlay {
   position: absolute;
@@ -117,6 +143,21 @@ function toggleForm() {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  // 굳이 넣어야하는지 모르겠음
+  .overlay-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('@/assets/image.png'); /* 넣고 싶은 사진 */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.5; /* 사진 투명도 */
+    z-index: -1; /* 내용물 뒤로 보내기 */
+  }
 }
 
 .overlay.right-active {
@@ -130,5 +171,9 @@ function toggleForm() {
   justify-content: center;
   padding: 40px;
   text-align: center;
+}
+
+.overlay-panel h1 {
+  transform: translateY(-200px); /* 글자만 위로 올리기 */
 }
 </style>

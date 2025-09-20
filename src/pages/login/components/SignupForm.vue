@@ -129,8 +129,8 @@ async function sendEmail() {
     return;
   }
   try {
-    await axios.post('http://localhost:8080/api/email/send', { email: formData.email });
     alert('이메일 인증 코드가 전송되었습니다.');
+    await axios.post('http://localhost:8080/api/email/send', { email: formData.email });
   } catch (error) {
     alert('이메일 전송에 실패했습니다.');
   }
