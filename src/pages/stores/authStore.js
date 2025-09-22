@@ -30,12 +30,18 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 엑세스 토큰 재발급
   const refreshAccessToken = async () => {
-    const response = await apiClient.post('/refresh', null, {
-      _skipInterceptor: true,
-    });
+    const savedRefreshToken = localStorage.getItem('refreshToken');
+    if (!savedRefreshToken) throw new Error('No refresh token');
+
+    const response = await apiClient.post(
+      '/refresh',
+      { refreshToken: savedRefreshToken }, // JSON body
+      { _skipInterceptor: true },
+    );
 
     if (response.status === 200) {
       Object.assign(tokenInfo, response.data);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
     }
   };
 
