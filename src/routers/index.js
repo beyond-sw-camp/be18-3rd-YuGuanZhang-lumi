@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * router/index.js
  *
@@ -15,7 +16,7 @@ const routes = [
   { path: '/login', component: Login, meta: { layout: 'blank' } },
   { path: '/signup', component: Signup, meta: { layout: 'blank' } },
   { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
-  { path: '/calendar', component: () => import('@/pages/calender'), meta: { layout: 'root' } },
+  { path: '/calendar', component: () => import('@/pages/calendar'), meta: { layout: 'root' } },
   { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
   { path: '/setting', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
   {
