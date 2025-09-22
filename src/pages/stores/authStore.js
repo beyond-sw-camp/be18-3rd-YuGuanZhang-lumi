@@ -16,16 +16,25 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // 로그인 처리
+  // 로그인 처리
   const login = async formData => {
-    const response = await apiClient.post('/login', formData, {});
+    try {
+      const response = await apiClient.post('/login', formData);
 
-    if (response.status === 200) {
-      Object.assign(tokenInfo, response.data.data[0]);
-      localStorage.setItem('refreshToken', tokenInfo.refreshToken);
-      console.log('[Login] tokenInfo:', tokenInfo);
+      if (response.status === 200 && response.data.data?.length) {
+        Object.assign(tokenInfo, response.data.data[0]);
+        localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+        return response.data;
+      }
+
+      throw new Error(response.data.message || '로그인 실패');
+    } catch (error) {
+      // 콘솔 확인용
+      console.error('[Login Error Raw]', error.response?.data);
+
+      // 그대로 던져버림 (Error로 감싸지 않음!)
+      throw error;
     }
-
-    return response.data;
   };
 
   // 엑세스 토큰 재발급

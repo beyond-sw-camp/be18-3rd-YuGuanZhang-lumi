@@ -38,7 +38,8 @@
           style="height: 50px; margin-left: 8px"
           @click="handleSendEmail"
         >
-          인증 전송
+          <span v-if="!isSending">인증 전송</span>
+          <span v-else>{{ countdown }}초 후 재전송</span>
         </v-btn>
       </v-col>
     </v-row>
@@ -100,8 +101,12 @@
 <script setup>
 import { useAuthStore } from '../stores/authStore';
 import { reactive, toRaw, computed } from 'vue';
+import { ref } from 'vue';
 
 const authStore = useAuthStore();
+
+const isSending = ref(false);
+const countdown = ref(0);
 
 const formData = reactive({
   name: '',
@@ -126,25 +131,33 @@ function goBack() {
 }
 
 async function handleSendEmail() {
+  if (isSending.value) return;
+
   try {
+    isSending.value = true;
+    countdown.value = 10;
+
     alert('이메일 인증 코드가 전송되었습니다.');
     await authStore.sendEmail(formData.email);
+    const timer = setInterval(() => {
+      countdown.value -= 1;
+      if (countdown.value <= 0) {
+        clearInterval(timer);
+        isSending.value = false;
+      }
+    }, 1000);
   } catch (error) {
     alert(error.message || '이메일 전송에 실패했습니다.');
   }
 }
 
 async function handleSignUp() {
-  if (!formData.name) return alert('이름을 입력해주세요.');
-  if (!formData.email) return alert('이메일을 입력해주세요.');
-  if (!formData.password) return alert('비밀번호를 입력해주세요.');
-  if (!formData.agree) return alert('개인정보 및 이용 동의를 수락해주세요.');
-
   try {
     await authStore.signUp(toRaw(formData));
     alert('회원가입 성공했습니다.');
     emit('switch-to-login');
   } catch (error) {
+    // 백엔드에서 던진 예외 메시지 그대로 사용
     alert(error.response?.data?.message || '회원가입 실패했습니다.');
   }
 }

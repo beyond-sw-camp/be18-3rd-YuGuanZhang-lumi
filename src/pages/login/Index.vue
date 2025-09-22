@@ -61,11 +61,12 @@ function toggleForm() {
 
 async function handleLogin(formData) {
   try {
-    console.log(formData);
     await authStore.login(formData);
     router.push('/channels');
   } catch (error) {
-    alert(error.message);
+    const backendMessage =
+      error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.';
+    alert(backendMessage);
   }
 }
 </script>
