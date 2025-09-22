@@ -38,7 +38,6 @@ export const useAuthStore = defineStore('auth', () => {
       { refreshToken: savedRefreshToken }, // JSON body
       { _skipInterceptor: true },
     );
-
     if (response.status === 200) {
       Object.assign(tokenInfo, response.data);
       localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -47,10 +46,18 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 로그아웃 처리
   const logout = async () => {
-    const response = await apiClient.post('/logout', null, {});
+    const savedRefreshToken = localStorage.getItem('refreshToken');
+    if (!savedRefreshToken) return;
 
-    if (response.status === 204) {
+    const response = await apiClient.post(
+      '/logout',
+      { refreshToken: savedRefreshToken },
+      { _skipInterceptor: true },
+    );
+
+    if (response.status === 200) {
       performLogout();
+      localStorage.removeItem('refreshToken');
     }
 
     return response;

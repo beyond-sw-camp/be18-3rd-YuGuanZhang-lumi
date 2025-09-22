@@ -50,29 +50,14 @@
   </v-main>
 </template>
 <script setup>
-import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/pages/stores/authStore';
+import router from '@/routers';
 
-const router = useRouter();
+const authStore = useAuthStore();
 
 async function logout() {
   try {
-    const refreshToken = localStorage.getItem('refreshToken');
-    console.log('프론트에서 보낼 refreshToken:', refreshToken);
-
-    if (!refreshToken) {
-      alert('저장된 토큰이 없어 로그아웃할 수 없습니다.');
-      return;
-    }
-
-    // 백엔드에 refreshToken 전달
-    await axios.post('http://localhost:8080/api/logout', {
-      refreshToken: refreshToken,
-    });
-
-    // 클라이언트에서 토큰 제거
-    localStorage.removeItem('refreshToken');
-
+    await authStore.logout();
     alert('로그아웃 되었습니다.');
     router.push('/login');
   } catch (error) {

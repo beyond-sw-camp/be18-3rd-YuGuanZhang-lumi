@@ -7,7 +7,6 @@
           <v-card class="form-card sign-in" :class="{ active: isSignUpActive }">
             <v-card-title class="justify-center">Sign In</v-card-title>
             <v-card-text>
-              <!-- ✅ emit 받아서 handleLogin 실행 -->
               <LoginForm @form-submit="handleLogin" />
             </v-card-text>
           </v-card>
