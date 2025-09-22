@@ -32,7 +32,12 @@
         </div>
       </v-col>
       <v-col class="d-flex" cols="4">
-        <v-btn block color="#eeddff" style="height: 50px; margin-left: 8px" @click="sendEmail">
+        <v-btn
+          block
+          color="#eeddff"
+          style="height: 50px; margin-left: 8px"
+          @click="handleSendEmail"
+        >
           인증 전송
         </v-btn>
       </v-col>
@@ -81,7 +86,11 @@
       <v-btn color="#eeddff" style="height: 50px; width: 48%; font-weight: bold" @click="goBack">
         뒤로가기
       </v-btn>
-      <v-btn color="#eeddff" style="height: 50px; width: 48%; font-weight: bold" @click="signUp">
+      <v-btn
+        color="#eeddff"
+        style="height: 50px; width: 48%; font-weight: bold"
+        @click="handleSignUp"
+      >
         회원가입 완료
       </v-btn>
     </v-row>
@@ -89,8 +98,10 @@
 </template>
 
 <script setup>
-import axios from 'axios';
-import { reactive, toRaw, computed, ref } from 'vue';
+import { useAuthStore } from '../stores/authStore';
+import { reactive, toRaw, computed } from 'vue';
+
+const authStore = useAuthStore();
 
 const formData = reactive({
   name: '',
@@ -100,22 +111,13 @@ const formData = reactive({
   agree: false,
 });
 
-const passwordError = ref('');
-
-const emailValid = computed(() => {
-  const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
-  return regex.test(formData.email);
-});
-
-const passwordValid = computed(() => {
-  const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-  return regex.test(formData.password);
-});
-
-const passwordMatch = computed(
-  () =>
-    formData.password && formData.passwordConfirm && formData.password === formData.passwordConfirm,
+const emailValid = computed(() =>
+  /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/.test(formData.email),
 );
+const passwordValid = computed(() =>
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/.test(formData.password),
+);
+const passwordMatch = computed(() => formData.password === formData.passwordConfirm);
 
 const emit = defineEmits(['switch-to-login']);
 
@@ -123,41 +125,27 @@ function goBack() {
   emit('switch-to-login');
 }
 
-async function sendEmail() {
-  if (!formData.email) {
-    alert('이메일을 입력해주세요.');
-    return;
-  }
+async function handleSendEmail() {
   try {
     alert('이메일 인증 코드가 전송되었습니다.');
-    await axios.post('http://localhost:8080/api/email/send', { email: formData.email });
+    await authStore.sendEmail(formData.email);
   } catch (error) {
-    alert('이메일 전송에 실패했습니다.');
+    alert(error.message || '이메일 전송에 실패했습니다.');
   }
 }
 
-async function signUp() {
+async function handleSignUp() {
   if (!formData.name) return alert('이름을 입력해주세요.');
   if (!formData.email) return alert('이메일을 입력해주세요.');
   if (!formData.password) return alert('비밀번호를 입력해주세요.');
   if (!formData.agree) return alert('개인정보 및 이용 동의를 수락해주세요.');
 
   try {
-    const response = await axios.post('http://localhost:8080/api/sign-up', {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      isPrivacyAgreement: formData.agree,
-    });
+    await authStore.signUp(toRaw(formData));
     alert('회원가입 성공했습니다.');
-    ``;
     emit('switch-to-login');
   } catch (error) {
-    if (error.response && error.response.data) {
-      alert(error.response.data.message);
-    } else {
-      passwordError.value = '회원가입 실패했습니다.';
-    }
+    alert(error.response?.data?.message || '회원가입 실패했습니다.');
   }
 }
 

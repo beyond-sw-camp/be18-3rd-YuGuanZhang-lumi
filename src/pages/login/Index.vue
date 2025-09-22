@@ -7,7 +7,8 @@
           <v-card class="form-card sign-in" :class="{ active: isSignUpActive }">
             <v-card-title class="justify-center">Sign In</v-card-title>
             <v-card-text>
-              <LoginForm />
+              <!-- ✅ emit 받아서 handleLogin 실행 -->
+              <LoginForm @form-submit="handleLogin" />
             </v-card-text>
           </v-card>
 
@@ -38,23 +39,52 @@
 
 <script setup>
 import { ref } from 'vue';
-import LoginForm from './components/LoginForm.vue';
-import SignupForm from './components/SignupForm.vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/authStore';
+import LoginForm from '../auth/LoginForm.vue';
+import SignupForm from '../auth/SignupForm.vue';
+
 const isSignUpActive = ref(false);
+const router = useRouter();
+const authStore = useAuthStore();
 
 function toggleForm() {
   isSignUpActive.value = !isSignUpActive.value;
+
+  if (isSignUpActive.value) {
+    // 슬라이드 회원가입 폼 + URL만 /signup 으로 변경
+    window.history.replaceState(history.state, '', '/signup');
+  } else {
+    // 다시 로그인 폼 + URL만 /login 으로 변경
+    window.history.replaceState(history.state, '', '/login');
+  }
+}
+
+async function handleLogin(formData) {
+  try {
+    console.log(formData);
+    await authStore.login(formData);
+    router.push('/channels');
+  } catch (error) {
+    alert(error.message);
+  }
 }
 </script>
 
 <style scoped lang="scss">
+::v-deep(.v-input input) {
+  color: black !important;
+}
+::v-deep(.v-input .v-field__outline) {
+  border-color: black !important;
+}
+
 .login-page {
   position: relative;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: none;
   z-index: 1;
 }
@@ -70,7 +100,7 @@ function toggleForm() {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.7; /* 투명도 조절 */
+  opacity: 0.7;
 }
 
 .card-container {
@@ -94,34 +124,25 @@ function toggleForm() {
   justify-content: center;
   padding: 60px;
 }
-
-/* 로그인 카드 */
 .form-card.sign-in {
   left: 0;
   z-index: 2;
 }
-
-/* 회원가입 카드 (기본 숨김) */
 .form-card.sign-up {
   left: 0;
   opacity: 0;
   z-index: 1;
   pointer-events: none;
 }
-
-/* 로그인 → 회원가입 슬라이드 */
 .form-card.active.sign-in {
   transform: translateX(100%);
 }
-
-/* 회원가입 활성화 */
 .form-card.active.sign-up {
   transform: translateX(100%);
   opacity: 1;
   z-index: 5;
   pointer-events: auto;
 }
-
 .form-card .v-card-text {
   flex: 1;
   display: flex;
@@ -144,26 +165,23 @@ function toggleForm() {
   align-items: center;
   justify-content: center;
 
-  // 굳이 넣어야하는지 모르겠음
   .overlay-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('@/assets/image.png'); /* 넣고 싶은 사진 */
+    background-image: url('@/assets/image.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.5; /* 사진 투명도 */
-    z-index: -1; /* 내용물 뒤로 보내기 */
+    opacity: 0.5;
+    z-index: -1;
   }
 }
-
 .overlay.right-active {
   transform: translateX(-100%);
 }
-
 .overlay-panel {
   display: flex;
   flex-direction: column;
@@ -172,8 +190,7 @@ function toggleForm() {
   padding: 40px;
   text-align: center;
 }
-
 .overlay-panel h1 {
-  transform: translateY(-200px); /* 글자만 위로 올리기 */
+  transform: translateY(-200px);
 }
 </style>
