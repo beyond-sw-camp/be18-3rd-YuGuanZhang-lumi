@@ -45,13 +45,6 @@ import ChannelFormModal from './components/ChannelFormModal.vue';
 const router = useRouter();
 const channels = ref([]);
 
-// 더미 데이터
-// const channels = ref([
-//   { id: 1, name: '프론트엔드 스터디', subject: 'Vue.js' },
-//   { id: 2, name: '백엔드 프로젝트', subject: 'Spring Boot' },
-//   { id: 3, name: '알고리즘 모임', subject: '자료구조' },
-// ]);
-
 // 등록/수정 모달
 const formDialog = ref(false);
 const formMode = ref('create'); // "create" | "edit"
