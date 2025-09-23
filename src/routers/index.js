@@ -10,6 +10,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
+import { useAuthStore } from '@/pages/stores/authStore';
 
 const routes = [
   { path: '/', redirect: '/channels' },
@@ -90,6 +91,24 @@ router.onError((err, to) => {
 
 router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload');
+});
+
+router.beforeEach(async to => {
+  const authStore = useAuthStore();
+
+  try {
+    if (authStore.tokenInfo.accessToken === '') {
+      await authStore.refreshAccessToken();
+    }
+
+    if (to.path === '/login' && authStore.tokenInfo.accessToken) {
+      return { path: '/channels' };
+    }
+  } catch {
+    if (to.path !== '/login') {
+      return { path: '/login' };
+    }
+  }
 });
 
 export default router;
