@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, toRaw  } from 'vue';
+import { computed, reactive, ref, toRaw } from 'vue';
 import { useAuthStore } from '../stores/authStore';
 
 const authStore = useAuthStore();
@@ -161,7 +161,5 @@ async function handleSignUp() {
   }
 }
 
-function submitClick() {
-  emit('form-submit', toRaw(formData));
-}
+function submitClick() {}
 </script>
