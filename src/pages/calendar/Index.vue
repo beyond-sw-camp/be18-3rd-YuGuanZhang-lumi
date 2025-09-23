@@ -39,54 +39,69 @@
 
           <v-divider class="mb-4"></v-divider>
 
-          <v-card v-if="tasks.length > 0" class="overflow-auto" style="max-height: 470px">
+          <v-card class="overflow-auto" style="max-height: 470px; min-height: 470px">
             <v-list class="py-0">
-              <template v-for="(task, i) in tasks" :key="task.todoId">
-                <v-divider v-if="i !== 0" />
+              <template v-if="tasks.length > 0">
+                <template v-for="(task, i) in tasks" :key="task.todoId">
+                  <v-divider v-if="i !== 0" />
 
-                <v-list-item>
-                  <template #prepend>
-                    <v-checkbox-btn
-                      color="grey"
-                      :model-value="task.status"
-                      @click.stop
-                      @update:model-value="() => updateStatus(task)"
-                    />
-                  </template>
-
-                  <v-list-item-title>
-                    <!-- 수정 중 -->
-                    <span v-if="editingTodoId === task.todoId">
-                      <v-text-field
-                        v-model="editingText"
-                        dense
-                        hide-details
-                        variant="underlined"
+                  <v-list-item>
+                    <template #prepend>
+                      <v-checkbox-btn
+                        color="grey"
+                        :model-value="task.status"
                         @click.stop
-                        @keydown.enter.prevent="saveEdit(task.todoId)"
+                        @update:model-value="() => updateStatus(task)"
                       />
-                    </span>
+                    </template>
 
-                    <span v-else :class="{ 'text-grey': task.status }">
-                      {{ task.description }}
-                    </span>
+                    <!-- 제목 -->
+                    <v-list-item-title>
+                      <span v-if="editingTodoId === task.todoId">
+                        <v-text-field
+                          v-model="editingText"
+                          dense
+                          hide-details
+                          variant="underlined"
+                          @click.stop
+                          @keydown.enter.prevent="saveEdit(task.todoId)"
+                        />
+                      </span>
+                      <span v-else :class="{ 'text-grey': task.status }">
+                        {{ task.description }}
+                      </span>
+                    </v-list-item-title>
+
+                    <!-- 메뉴 -->
+                    <template #append>
+                      <v-menu>
+                        <template #activator="{ props }">
+                          <v-btn
+                            icon="mdi-dots-vertical"
+                            variant="text"
+                            v-bind="props"
+                            @click.stop
+                          />
+                        </template>
+                        <v-list>
+                          <v-list-item class="text-button" @click="editTask(task)">
+                            수정하기
+                          </v-list-item>
+                          <v-list-item class="text-button" @click="askDelete(task.todoId)">
+                            삭제하기
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </template>
+                  </v-list-item>
+                </template>
+              </template>
+
+              <template v-else>
+                <v-list-item style="min-height: 500px">
+                  <v-list-item-title class="text-center text-grey">
+                    할 일이 없습니다.
                   </v-list-item-title>
-
-                  <template #append>
-                    <v-menu>
-                      <template #activator="{ props }">
-                        <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props" @click.stop />
-                      </template>
-                      <v-list>
-                        <v-list-item class="text-button" @click="editTask(task)">
-                          수정하기
-                        </v-list-item>
-                        <v-list-item class="text-button" @click="askDelete(task.todoId)">
-                          삭제하기
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </template>
                 </v-list-item>
               </template>
             </v-list>
