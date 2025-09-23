@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div>수업관리 페이지 입니다.</div>
 </template>
 
 <script>
