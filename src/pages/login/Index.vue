@@ -62,6 +62,7 @@ function toggleForm() {
 async function handleLogin(formData) {
   try {
     await authStore.login(formData);
+    console.log('로그인 후 accessToken:', authStore.tokenInfo.accessToken);
     router.push('/channels');
   } catch (error) {
     const backendMessage =

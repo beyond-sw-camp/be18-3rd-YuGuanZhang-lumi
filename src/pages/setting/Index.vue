@@ -41,13 +41,13 @@ async function userInfo() {
 <style lang="scss" scoped>
 .profileContainer {
   display: flex;
-  align-items: flex-start; /* 아이콘과 글씨를 위쪽 정렬 */
-  gap: 20px; /* 아이콘과 정보 간격 */
+  align-items: flex-start;
+  gap: 20px;
   margin-top: 20px;
 }
 
 .profile {
-  font-size: 300px; /* 아이콘 크기 */
+  font-size: 300px;
   color: gray;
 }
 

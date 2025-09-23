@@ -1,16 +1,23 @@
-import apiClient from '../api';
+import apiClient from '@/apis/apiClient';
+// stores/authStore.js
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
   const tokenInfo = reactive({
     accessToken: '',
+    refreshToken: '',
     name: '',
     email: '',
-    refreshToken: '',
   });
 
+  // 새로고침 시 localStorage에서 토큰 불러오기
+  const savedAccessToken = localStorage.getItem('accessToken');
   const savedRefreshToken = localStorage.getItem('refreshToken');
+  if (savedAccessToken) {
+    tokenInfo.accessToken = savedAccessToken;
+    apiClient.defaults.headers['Authorization'] = `Bearer ${savedAccessToken}`;
+  }
   if (savedRefreshToken) {
     tokenInfo.refreshToken = savedRefreshToken;
   }
@@ -18,74 +25,78 @@ export const useAuthStore = defineStore('auth', () => {
   // 로그인 처리
   const login = async formData => {
     try {
+      // @ts-ignore
       const response = await apiClient.post('/login', formData, { _skipInterceptor: true });
 
       if (response.status === 200 && response.data.data?.length) {
         Object.assign(tokenInfo, response.data.data[0]);
+
         localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+
+        // apiClient 기본 헤더에 토큰 세팅
+        apiClient.defaults.headers['Authorization'] = `Bearer ${tokenInfo.accessToken}`;
         return response.data;
       }
 
       throw new Error(response.data.message);
     } catch (error) {
-      // 백엔드에서 보낸 에러 메시지 추출
       const backendMessage = error.response?.data?.message;
-
-      console.error('[Login Error Raw]', backendMessage);
-
-      // 프론트 UI에서 바로 쓸 수 있게 메시지 전달
-      throw new Error(backendMessage);
+      console.error('[Login Error]', backendMessage);
+      throw new Error(backendMessage || error.message);
     }
   };
 
-  // 엑세스 토큰 재발급
+  // accessToken 재발급
   const refreshAccessToken = async () => {
-    const savedRefreshToken = localStorage.getItem('refreshToken');
-    if (!savedRefreshToken) throw new Error('No refresh token');
+    if (!tokenInfo.refreshToken) throw new Error('No refresh token');
 
     const response = await apiClient.post(
       '/refresh',
-      { refreshToken: savedRefreshToken },
+      { refreshToken: tokenInfo.refreshToken },
+      // @ts-ignore
       { _skipInterceptor: true },
     );
+
     if (response.status === 200) {
-      Object.assign(tokenInfo, response.data);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      tokenInfo.accessToken = response.data.accessToken;
+      tokenInfo.refreshToken = response.data.refreshToken;
+
+      localStorage.setItem('accessToken', tokenInfo.accessToken);
+      localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+
+      apiClient.defaults.headers['Authorization'] = `Bearer ${tokenInfo.accessToken}`;
     }
   };
 
   // 로그아웃 처리
   const logout = async () => {
-    const savedRefreshToken = localStorage.getItem('refreshToken');
-    if (!savedRefreshToken) return;
+    if (!tokenInfo.refreshToken) return;
 
-    const response = await apiClient.post(
-      '/logout',
-      { refreshToken: savedRefreshToken },
-      { _skipInterceptor: true },
-    );
-
-    if (response.status === 200) {
-      performLogout();
-      localStorage.removeItem('refreshToken');
+    try {
+      await apiClient.post(
+        '/logout',
+        { refreshToken: tokenInfo.refreshToken },
+        // @ts-ignore
+        { _skipInterceptor: true },
+      );
+    } catch (err) {
+      console.warn('Logout failed', err);
     }
 
-    return response;
+    performLogout();
   };
 
-  // 공통 로그아웃 처리 함수
+  // 공통 로그아웃
   const performLogout = () => {
-    // 사용자 정보 초기화
     tokenInfo.accessToken = '';
+    tokenInfo.refreshToken = '';
     tokenInfo.name = '';
     tokenInfo.email = '';
-    tokenInfo.refreshToken = '';
-  };
 
-  const sendEmail = async email => {
-    if (!email) throw new Error('이메일을 입력해주세요.');
-    const response = await apiClient.post('/email/send', { email });
-    return response;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
+    apiClient.defaults.headers['Authorization'] = '';
   };
 
   // 회원가입
@@ -100,16 +111,19 @@ export const useAuthStore = defineStore('auth', () => {
     return response.data;
   };
 
+  // 이메일
+  const sendEmail = async email => {
+    if (!email) throw new Error('이메일을 입력해주세요.');
+    const response = await apiClient.post('/email/send', { email });
+    return response;
+  };
+
   // 회원탈퇴
   const deleted = async formData => {
-    const payload = {
-      email: formData.email,
-    };
+    const payload = { email: formData.email };
 
     const response = await apiClient.patch('/user/me', payload, {
-      headers: {
-        Authorization: `Bearer ${tokenInfo.accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
     });
 
     if (response.status === 200) {
@@ -120,35 +134,19 @@ export const useAuthStore = defineStore('auth', () => {
     return response.data;
   };
 
-  // 사용자 이름
+  // 사용자 프로필 불러오기
   const fetchProfile = async () => {
     try {
       const response = await apiClient.get('/user/profile');
-
       const profile = response.data.data[0];
+
       tokenInfo.name = profile.name;
       tokenInfo.email = profile.email;
 
       return profile;
-    } catch (error) {
-      console.error('프로필 불러오기 실패', error);
-      throw error;
-    }
-  };
-
-  // 사용자 정보
-  const fetchUserInfo = async () => {
-    try {
-      const response = await apiClient.get('/user/profile');
-
-      const profile = response.data.data[0];
-      tokenInfo.name = profile.name;
-      tokenInfo.email = profile.email;
-
-      return profile;
-    } catch (error) {
-      console.error('프로필 불러오기 실패', error);
-      throw error;
+    } catch (err) {
+      console.error('Fetch profile failed', err);
+      throw err;
     }
   };
 
@@ -157,11 +155,10 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     refreshAccessToken,
     logout,
-    performLogout,
     sendEmail,
+    performLogout,
     signUp,
-    deleted,
     fetchProfile,
-    fetchUserInfo,
+    deleted,
   };
 });
