@@ -1,6 +1,6 @@
-import apiClient from '../api';
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+import apiClient from '../api';
 
 export const useAuthStore = defineStore('auth', () => {
   const tokenInfo = reactive({

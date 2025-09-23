@@ -38,37 +38,29 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   response => response,
   async error => {
-    // 이전 요청에 대한 config 객체를 얻어온다.
     const originConfig = error.config;
+    const authStore = useAuthStore();
 
-    // 토큰이 만료되어 401 에러가 발생한 경우
-    if (error.response && error.response.status === 401 && !originConfig._retry) {
+    const backendMessage = error.response?.data?.message;
+
+    // 백엔드에서 내려주는 메시지를 그대로 UI로 전달
+    if (backendMessage) {
+      throw error; // 메시지가 있으면 refresh 시도하지 않고 그대로 전달
+    }
+
+    // 401 발생 시 refresh 토큰 재발급
+    if (error.response?.status === 401 && !originConfig._retry) {
       originConfig._retry = true;
-      const authStore = useAuthStore();
-      console.log(
-        '[Axios Response] 401 발생, Refresh Token 시도:',
-        authStore.tokenInfo.refreshToken,
-      );
-
       try {
-        // 리프레시 토큰을 사용하여 새 액세스 토큰을 요청한다.
         await authStore.refreshAccessToken();
-
-        console.log(
-          '[Axios Response] 토큰 재발급 완료, 새 Access Token:',
-          authStore.tokenInfo.accessToken,
-        );
-        // 원래 요청을 다시 재시도
         return apiClient(originConfig);
       } catch (refreshError) {
-        console.log('[Axios Response] 토큰 재발급 실패, 로그아웃 처리');
         authStore.performLogout();
-
         return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error);
+    throw error;
   },
 );
 

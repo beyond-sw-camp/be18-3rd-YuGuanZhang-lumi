@@ -90,7 +90,7 @@ router.beforeEach(async (to, from) => {
     if (to.path === '/login' && authStore.tokenInfo.accessToken) {
       return { path: '/channels' };
     }
-  } catch (error) {
+  } catch {
     if (to.path !== '/login') {
       return { path: '/login' };
     }

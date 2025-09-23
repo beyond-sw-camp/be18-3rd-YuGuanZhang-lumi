@@ -99,9 +99,8 @@
 </template>
 
 <script setup>
+import { computed, reactive, ref, toRaw  } from 'vue';
 import { useAuthStore } from '../stores/authStore';
-import { reactive, toRaw, computed } from 'vue';
-import { ref } from 'vue';
 
 const authStore = useAuthStore();
 
