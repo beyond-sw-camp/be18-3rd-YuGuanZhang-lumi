@@ -91,7 +91,7 @@ router.beforeEach(async (to, from) => {
       return { path: '/channels' };
     }
   } catch (error) {
-    if (!['/login', '/channels'].includes(to.path)) {
+    if (to.path !== '/login') {
       return { path: '/login' };
     }
   }
