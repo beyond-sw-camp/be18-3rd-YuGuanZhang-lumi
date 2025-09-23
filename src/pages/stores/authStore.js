@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('auth', () => {
     name: '',
     email: '',
     refreshToken: '',
-    UUID: '',
   });
 
   const savedRefreshToken = localStorage.getItem('refreshToken');
@@ -145,7 +144,6 @@ export const useAuthStore = defineStore('auth', () => {
       const profile = response.data.data[0];
       tokenInfo.name = profile.name;
       tokenInfo.email = profile.email;
-      tokenInfo.UUID = profile.userId;
 
       return profile;
     } catch (error) {
