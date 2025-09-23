@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
     name: '',
     email: '',
     refreshToken: '',
+    UUID: '',
   });
 
   const savedRefreshToken = localStorage.getItem('refreshToken');
@@ -136,6 +137,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 사용자 정보
+  const fetchUserInfo = async () => {
+    try {
+      const response = await apiClient.get('/user/profile');
+
+      const profile = response.data.data[0];
+      tokenInfo.name = profile.name;
+      tokenInfo.email = profile.email;
+      tokenInfo.UUID = profile.userId;
+
+      return profile;
+    } catch (error) {
+      console.error('프로필 불러오기 실패', error);
+      throw error;
+    }
+  };
+
   return {
     tokenInfo,
     login,
@@ -146,5 +164,6 @@ export const useAuthStore = defineStore('auth', () => {
     signUp,
     deleted,
     fetchProfile,
+    fetchUserInfo,
   };
 });
