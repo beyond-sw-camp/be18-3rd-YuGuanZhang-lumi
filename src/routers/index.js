@@ -79,7 +79,7 @@ router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload');
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async to => {
   const authStore = useAuthStore();
 
   try {
