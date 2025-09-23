@@ -83,10 +83,7 @@
       style="margin-bottom: 16px"
     />
 
-    <v-row align="center" class="mt-2" justify="space-between">
-      <v-btn color="#eeddff" style="height: 50px; width: 48%; font-weight: bold" @click="goBack">
-        뒤로가기
-      </v-btn>
+    <v-row align="center" class="mt-2 justify-center">
       <v-btn
         color="#eeddff"
         style="height: 50px; width: 48%; font-weight: bold"
@@ -100,7 +97,7 @@
 
 <script setup>
 import { computed, reactive, ref, toRaw } from 'vue';
-import { useAuthStore } from '../../stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
 
