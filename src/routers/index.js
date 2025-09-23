@@ -11,7 +11,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
-import { useAuthStore } from '@/pages/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
   { path: '/', redirect: '/channels' },

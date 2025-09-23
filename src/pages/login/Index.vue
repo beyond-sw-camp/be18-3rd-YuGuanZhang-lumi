@@ -41,7 +41,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LoginForm from '../auth/LoginForm.vue';
 import SignupForm from '../auth/SignupForm.vue';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../../stores/authStore';
 
 const isSignUpActive = ref(false);
 const router = useRouter();

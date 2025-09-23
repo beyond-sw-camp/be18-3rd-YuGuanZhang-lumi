@@ -100,7 +100,7 @@
 
 <script setup>
 import { computed, reactive, ref, toRaw } from 'vue';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '../../stores/authStore';
 
 const authStore = useAuthStore();
 
