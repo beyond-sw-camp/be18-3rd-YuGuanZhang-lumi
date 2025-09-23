@@ -9,14 +9,12 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Login from '@/pages/login';
-import Signup from '@/pages/signup';
+import Login from '@/pages/auth/';
 import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
   { path: '/', redirect: '/channels' },
   { path: '/login', component: Login, meta: { layout: 'blank' } },
-  { path: '/signup', component: Signup, meta: { layout: 'blank' } },
   { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
   { path: '/calendar', component: () => import('@/pages/calendar'), meta: { layout: 'root' } },
   { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
