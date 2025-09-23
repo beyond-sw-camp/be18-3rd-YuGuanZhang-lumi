@@ -9,6 +9,7 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
+import { getChannel } from '@/apis/channel';
 import Login from '@/pages/auth/';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -102,6 +103,14 @@ router.beforeEach(async to => {
 
     if (to.path === '/login' && authStore.tokenInfo.accessToken) {
       return { path: '/channels' };
+    }
+
+    if (to.name === undefined && to.path.includes('/channels') && to.path.includes('classes')) {
+      const channelId = to.params.channelId;
+      const channel = await getChannel(channelId);
+      if (channel.roleName !== 'TUTOR') {
+        return { path: `/channels/${channelId}/assignments` };
+      }
     }
   } catch {
     if (to.path !== '/login') {
