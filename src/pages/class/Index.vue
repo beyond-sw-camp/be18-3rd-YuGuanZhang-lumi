@@ -11,81 +11,72 @@
       </v-col>
 
       <v-col cols="4">
-        <v-card class="pa-6" max-width="500">
-          <v-card-title class="text-h6 mb-4">일정 등록/수정</v-card-title>
+        <v-card class="pa-4 d-flex flex-column" style="max-height: 600px; min-height: 600px">
+          <v-card-title class="text-subtitle-1 pa-0 ma-0">
+            {{ editingId ? '일정 수정하기' : '일정 등록하기' }}
+          </v-card-title>
+          <v-list density="compact">
+            <v-list-item class="pa-0">
+              <v-list-item-title class="text-body-2 pb-2">수업 시작</v-list-item-title>
+              <v-text-field
+                v-model="form.startDate"
+                class="small-input"
+                density="compact"
+                type="datetime-local"
+                variant="outlined"
+              />
+            </v-list-item>
 
-          <v-form v-model="valid">
-            <!-- 수업 시작 날짜/시간 -->
-            <v-row align="center" class="mb-4">
-              <v-col cols="4">수업 시작 날짜/시간</v-col>
-              <v-col>
-                <v-text-field
-                  v-model="form.startDate"
-                  density="compact"
-                  type="datetime-local"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
+            <v-list-item class="pa-0">
+              <v-list-item-title class="text-body-2 pb-2">수업 종료</v-list-item-title>
+              <v-text-field
+                v-model="form.endDate"
+                class="small-input"
+                density="compact"
+                type="datetime-local"
+                variant="outlined"
+              />
+            </v-list-item>
 
-            <!-- 수업 종료 날짜/시간 -->
-            <v-row align="center" class="mb-4">
-              <v-col cols="4">수업 종료 날짜/시간</v-col>
-              <v-col>
-                <v-text-field
-                  v-model="form.endDate"
-                  density="compact"
-                  type="datetime-local"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
+            <v-list-item class="pa-0">
+              <v-list-item-title class="text-body-2 pb-2">장소</v-list-item-title>
+              <v-text-field
+                v-model="form.location"
+                class="small-input"
+                density="compact"
+                placeholder="장소를 입력해주세요."
+                variant="outlined"
+              />
+            </v-list-item>
 
-            <!-- 장소 -->
-            <v-row align="center" class="mb-4">
-              <v-col cols="4">장소</v-col>
-              <v-col>
-                <v-text-field
-                  v-model="form.location"
-                  density="compact"
-                  placeholder="장소 입력"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
+            <v-list-item class="pa-0">
+              <v-list-item-title class="text-body-2 pb-2">출결 상태</v-list-item-title>
+              <v-select
+                v-model="form.statusType"
+                class="small-input"
+                density="compact"
+                :items="['SCHEDULED', 'ATTEND', 'ABSENT', 'ILLNESS']"
+                variant="outlined"
+              />
+            </v-list-item>
+          </v-list>
+          <v-spacer />
 
-            <!-- 상태 -->
-            <v-row align="center" class="mb-6">
-              <v-col cols="4">상태</v-col>
-              <v-col>
-                <v-select
-                  v-model="form.status"
-                  density="compact"
-                  :items="['SCHEDULED', 'ABSENT', 'ILLENES', 'ATTEND']"
-                  placeholder="상태 선택"
-                  variant="outlined"
-                />
-              </v-col>
-            </v-row>
-
-            <!-- 버튼 -->
-            <v-row class="mt-6" justify="center">
-              <v-col class="d-flex justify-center" cols="6">
-                <v-btn color="primary" variant="flat" @click="submitForm">일정 등록</v-btn>
-              </v-col>
-              <v-col class="d-flex justify-center" cols="6">
-                <v-btn color="grey" variant="flat" @click="cancelForm">취소</v-btn>
-              </v-col>
-            </v-row>
-          </v-form>
+          <v-row class="mt-auto" justify="space-between" no-gutters>
+            <v-btn class="flex-grow-1 mx-1" color="primary" variant="flat" @click="submitForm">
+              {{ editingId ? '수정하기' : '등록하기' }}
+            </v-btn>
+            <v-btn class="flex-grow-1 mx-1" color="grey" variant="flat" @click="resetForm">
+              취소
+            </v-btn>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col>
-        <v-card class="overflow-auto" style="max-height: 470px; min-height: 200px">
+        <v-card class="overflow-auto" style="max-height: 250px; min-height: 250px">
           <v-list class="py-0">
-            <!-- 일정 있음 -->
             <template v-if="schedule && schedule.length > 0">
               <template v-for="(item, i) in schedule" :key="`${item.entityType}-${item.entityId}`">
                 <v-divider v-if="i !== 0" />
@@ -96,10 +87,30 @@
                     [{{ item.channelName }}] {{ item.entityType }} ({{ item.roleName }})
                   </v-list-item-title>
 
-                  <!-- COURSE -->
-                  <v-list-item-subtitle v-if="item.entityType === 'COURSE'">
+                  <v-list-item-subtitle>
                     일정 : {{ item.startDate || '-' }} ~ {{ item.endDate || '-' }}
                   </v-list-item-subtitle>
+                  <v-list-item-subtitle> 장소 : {{ item.location || '-' }} </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    출결 상태 : {{ item.statusType || '-' }}
+                  </v-list-item-subtitle>
+
+                  <!-- 수정/삭제 버튼 (내가 생성한 일정만) -->
+                  <template #append>
+                    <v-menu v-if="item.channelId === currentChannelId">
+                      <template #activator="{ props }">
+                        <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props" @click.stop />
+                      </template>
+                      <v-list>
+                        <v-list-item class="text-button" @click="editCourse(item)">
+                          수정하기
+                        </v-list-item>
+                        <v-list-item class="text-button" @click="askDelete(item.entityId)">
+                          삭제하기
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </template>
                 </v-list-item>
               </template>
             </template>
@@ -133,26 +144,34 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { VueCal } from 'vue-cal';
+import { useRoute } from 'vue-router';
 import { getCalendar } from '@/apis/calendar';
+import { createCourse, deleteCourse, updateCourse } from '@/apis/course';
 import { useApi } from '@/composable/useApi';
 import formatDate from '@/utils/formatDate';
+import formatDateTime from '@/utils/formatDateTime';
 import 'vue-cal/style';
 
 const { data: calendar, queryFnExecute: useGetCalendar } = useApi(getCalendar);
+const { queryFnExecute: useCreateCourse } = useApi(createCourse);
+const { queryFnExecute: useUpdateCourse } = useApi(updateCourse);
+const { queryFnExecute: useDeleteCourse } = useApi(deleteCourse);
 
 const form = ref({
   startDate: '',
   endDate: '',
   location: '',
-  status: null,
+  statusType: 'SCHEDULED',
 });
 
+const currentChannelId = Number(useRoute().params.channelId);
 const schedule = ref();
-const newTask = ref(null);
+const editingId = ref(null);
+
 const selectedDate = ref(formatDate(new Date()));
 
 const showDeleteModal = ref(false);
-const taskToDeleteId = ref(null);
+const courseToDeleteId = ref(null);
 
 onMounted(async () => {
   await refreshData();
@@ -163,21 +182,48 @@ async function refreshData(date = selectedDate.value) {
 
   if (!Array.isArray(calendar.value)) return;
 
-  schedule.value = calendar.value.map(item => ({
-    channelId: item.channelId,
-    channelName: item.channelName,
-    entityId: item.entityId,
-    entityType: item.entityType,
-    roleName: item.roleName,
-    location: item.location,
-    statusType: item.statusType,
-    startDate: item.startDate,
-    endDate: item.endDate,
-    deadlineAt: item.deadlineAt,
-    isSubmission: item.isSubmission,
-    evaluationDeadlineAt: item.evaluationDeadlineAt,
-    isEvaluation: item.isEvaluation,
-  }));
+  schedule.value = calendar.value
+    .filter(item => item.entityType === 'COURSE')
+    .map(item => ({
+      channelId: item.channelId,
+      channelName: item.channelName,
+      entityId: item.entityId,
+      entityType: item.entityType,
+      roleName: item.roleName,
+      location: item.location,
+      statusType: item.statusType,
+      startDate: item.startDate,
+      endDate: item.endDate,
+    }));
+}
+
+async function submitForm() {
+  try {
+    const payload = {
+      startDate: formatDateTime(new Date(form.value.startDate)),
+      endDate: formatDateTime(new Date(form.value.endDate)),
+      location: form.value.location,
+      statusType: form.value.statusType,
+    };
+
+    await (editingId.value
+      ? useUpdateCourse(currentChannelId, editingId.value, payload)
+      : useCreateCourse(currentChannelId, payload));
+    await refreshData();
+    resetForm();
+  } catch (error) {
+    console.error('제출 실패', error);
+  }
+}
+
+function resetForm() {
+  editingId.value = null;
+  form.value = {
+    startDate: '',
+    endDate: '',
+    location: '',
+    statusType: 'SCHEDULED',
+  };
 }
 
 async function onDateClick({ cell }) {
@@ -186,55 +232,40 @@ async function onDateClick({ cell }) {
   await refreshData(clickedDate);
 }
 
-function editTask(task) {
-  // editingTodoId.value = task.todoId;
-  // editingText.value = task.description;
+function editCourse(course) {
+  editingId.value = course.entityId;
+
+  form.value = {
+    startDate: course.startDate,
+    endDate: course.endDate,
+    location: course.location,
+    statusType: course.statusType,
+  };
 }
 
-async function saveEdit(todoId) {
-  try {
-    // await useUpdateTodo(todoId, { description: editingText.value });
-    // task.description = editingText.value;
-  } catch (error) {
-    console.error('수정 실패', error);
-  } finally {
-    // editingTodoId.value = null;
-  }
-}
-
-async function updateStatus(task) {
-  try {
-    // const newStatus = !task.status;
-    // await useUpdateTodo(task.todoId, { status: newStatus });
-    // task.status = newStatus;
-  } catch {
-    // console.error('상태 변경 실패', error);
-  }
-}
-
-function askDelete(todoId) {
+function askDelete(courseId) {
   showDeleteModal.value = true;
-  taskToDeleteId.value = todoId;
+  courseToDeleteId.value = courseId;
 }
 
 async function confirmDelete() {
-  const todoId = taskToDeleteId.value;
-  if (!todoId) return;
+  const courseId = courseToDeleteId.value;
+  if (!courseId) return;
 
   try {
-    // await useDeleteTodo(todoId);
-    // tasks.value = tasks.value.filter(task => task.todoId !== todoId); // 즉시 반영
+    await useDeleteCourse(currentChannelId, courseId);
+    await refreshData();
   } catch (error) {
     console.error('삭제 실패', error);
   } finally {
     showDeleteModal.value = false;
-    taskToDeleteId.value = null;
+    courseToDeleteId.value = null;
   }
 }
 
 function cancelDelete() {
   showDeleteModal.value = false;
-  taskToDeleteId.value = null;
+  courseToDeleteId.value = null;
 }
 </script>
 
@@ -261,6 +292,24 @@ function cancelDelete() {
     .vuecal__cell--has-events .vuecal__cell-date {
       align-self: flex-start;
     }
+  }
+}
+
+.small-input {
+  padding: 0;
+  :deep(.v-field__input) {
+    min-height: 32px !important;
+    font-size: 14px;
+  }
+
+  :deep(.v-overlay__content) {
+    min-width: 120px !important;
+    max-height: 150px !important;
+  }
+
+  :deep(.v-list-item-title) {
+    font-size: 14px !important;
+    padding: 2px 8px !important;
   }
 }
 </style>
