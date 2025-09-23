@@ -15,61 +15,68 @@
           <v-card-title class="text-subtitle-1 pa-0 ma-0">
             {{ editingId ? '일정 수정하기' : '일정 등록하기' }}
           </v-card-title>
-          <v-list density="compact">
-            <v-list-item class="pa-0">
-              <v-list-item-title class="text-body-2 pb-2">수업 시작</v-list-item-title>
-              <v-text-field
-                v-model="form.startDate"
-                class="small-input"
-                density="compact"
-                type="datetime-local"
-                variant="outlined"
-              />
-            </v-list-item>
+          <v-form ref="formRef" v-model="isValid">
+            <v-list density="compact">
+              <v-list-item class="pa-0">
+                <v-list-item-title class="text-body-2 pb-2">수업 시작</v-list-item-title>
+                <v-text-field
+                  v-model="form.startDate"
+                  class="small-input pb-4"
+                  density="compact"
+                  label="수업 시작"
+                  :rules="[validateStartDate]"
+                  type="datetime-local"
+                  variant="outlined"
+                />
+              </v-list-item>
 
-            <v-list-item class="pa-0">
-              <v-list-item-title class="text-body-2 pb-2">수업 종료</v-list-item-title>
-              <v-text-field
-                v-model="form.endDate"
-                class="small-input"
-                density="compact"
-                type="datetime-local"
-                variant="outlined"
-              />
-            </v-list-item>
+              <v-list-item class="pa-0">
+                <v-list-item-title class="text-body-2 pb-2">수업 종료</v-list-item-title>
+                <v-text-field
+                  v-model="form.endDate"
+                  class="small-input pb-4"
+                  density="compact"
+                  label="수업 종료"
+                  required
+                  :rules="[validateEndDate]"
+                  type="datetime-local"
+                  variant="outlined"
+                />
+              </v-list-item>
 
-            <v-list-item class="pa-0">
-              <v-list-item-title class="text-body-2 pb-2">장소</v-list-item-title>
-              <v-text-field
-                v-model="form.location"
-                class="small-input"
-                density="compact"
-                placeholder="장소를 입력해주세요."
-                variant="outlined"
-              />
-            </v-list-item>
+              <v-list-item class="pa-0">
+                <v-list-item-title class="text-body-2 pb-2">장소</v-list-item-title>
+                <v-text-field
+                  v-model="form.location"
+                  class="small-input pb-4"
+                  density="compact"
+                  placeholder="장소를 입력해주세요."
+                  variant="outlined"
+                />
+              </v-list-item>
 
-            <v-list-item class="pa-0">
-              <v-list-item-title class="text-body-2 pb-2">출결 상태</v-list-item-title>
-              <v-select
-                v-model="form.statusType"
-                class="small-input"
-                density="compact"
-                :items="['SCHEDULED', 'ATTEND', 'ABSENT', 'ILLNESS']"
-                variant="outlined"
-              />
-            </v-list-item>
-          </v-list>
-          <v-spacer />
+              <v-list-item class="pa-0">
+                <v-list-item-title class="text-body-2 pb-2">출결 상태</v-list-item-title>
+                <v-select
+                  v-model="form.statusType"
+                  class="small-input pb-4"
+                  density="compact"
+                  :items="['SCHEDULED', 'ATTEND', 'ABSENT', 'ILLNESS']"
+                  variant="outlined"
+                />
+              </v-list-item>
+            </v-list>
+            <v-spacer />
 
-          <v-row class="mt-auto" justify="space-between" no-gutters>
-            <v-btn class="flex-grow-1 mx-1" color="primary" variant="flat" @click="submitForm">
-              {{ editingId ? '수정하기' : '등록하기' }}
-            </v-btn>
-            <v-btn class="flex-grow-1 mx-1" color="grey" variant="flat" @click="resetForm">
-              취소
-            </v-btn>
-          </v-row>
+            <v-row class="mt-auto" justify="space-between" no-gutters>
+              <v-btn class="flex-grow-1 mx-1" color="primary" variant="flat" @click="submitForm">
+                {{ editingId ? '수정하기' : '등록하기' }}
+              </v-btn>
+              <v-btn class="flex-grow-1 mx-1" color="grey" variant="flat" @click="resetForm">
+                취소
+              </v-btn>
+            </v-row>
+          </v-form>
         </v-card>
       </v-col>
     </v-row>
@@ -164,6 +171,9 @@ const form = ref({
   statusType: 'SCHEDULED',
 });
 
+const formRef = ref(null);
+const isValid = ref(false);
+
 const currentChannelId = Number(useRoute().params.channelId);
 const schedule = ref();
 const editingId = ref(null);
@@ -197,7 +207,26 @@ async function refreshData(date = selectedDate.value) {
     }));
 }
 
+function validateStartDate(value) {
+  if (!value) return '시작 시간을 입력해주세요.';
+  const start = new Date(value);
+  if (start < new Date()) return '시작 시간은 현재 시간 이후여야 합니다.';
+  return true;
+}
+
+function validateEndDate(value) {
+  if (!value) return '종료 시간을 입력해주세요.';
+  const end = new Date(value);
+  const start = new Date(form.value.startDate);
+
+  if (end <= new Date()) return '종료 시간은 현재 시간 이후여야 합니다.';
+  if (start && end <= start) return '종료 시간은 시작 시간 이후여야 합니다.';
+  return true;
+}
+
 async function submitForm() {
+  const isFormValid = await formRef.value.validate();
+  if (!isFormValid) return;
   try {
     const payload = {
       startDate: formatDateTime(new Date(form.value.startDate)),

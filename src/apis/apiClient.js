@@ -20,7 +20,7 @@ apiClient.interceptors.request.use(
 
     // authStore에서 accessToken을 가져온다.
     const authStore = useAuthStore();
-    const accessToken = authStore.tokenInfo.accessToken;
+    const accessToken = authStore.tokenInfo.accessToken; 
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
