@@ -1,7 +1,7 @@
-import apiClient from '@/apis/apiClient';
 // stores/authStore.js
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+import apiClient from '@/apis/apiClient';
 
 export const useAuthStore = defineStore('auth', () => {
   const tokenInfo = reactive({
@@ -79,8 +79,8 @@ export const useAuthStore = defineStore('auth', () => {
         // @ts-ignore
         { _skipInterceptor: true },
       );
-    } catch (err) {
-      console.warn('Logout failed', err);
+    } catch (error) {
+      console.warn('Logout failed', error);
     }
 
     performLogout();
@@ -144,9 +144,9 @@ export const useAuthStore = defineStore('auth', () => {
       tokenInfo.email = profile.email;
 
       return profile;
-    } catch (err) {
-      console.error('Fetch profile failed', err);
-      throw err;
+    } catch (error) {
+      console.error('Fetch profile failed', error);
+      throw error;
     }
   };
 

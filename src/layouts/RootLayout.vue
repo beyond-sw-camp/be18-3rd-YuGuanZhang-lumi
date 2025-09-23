@@ -50,9 +50,9 @@
   </v-main>
 </template>
 <script setup>
-import { useAuthStore } from '@/pages/stores/authStore';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { onMounted, computed } from 'vue';
+import { useAuthStore } from '@/pages/stores/authStore';
 
 const authStore = useAuthStore();
 const router = useRouter();
