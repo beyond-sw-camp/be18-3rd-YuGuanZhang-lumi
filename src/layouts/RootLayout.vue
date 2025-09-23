@@ -37,7 +37,7 @@
     <!-- 채널명 필요 -->
     <v-spacer />
     <v-btn variant="plain"> 사용자 이름 </v-btn>
-    <v-btn variant="plain"> 로그아웃 </v-btn>
+    <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>
     <v-btn icon><v-icon>mdi-cog</v-icon></v-btn>
   </v-app-bar>
 
@@ -49,7 +49,23 @@
     </v-container>
   </v-main>
 </template>
-<script setup></script>
+<script setup>
+import { useAuthStore } from '@/pages/stores/authStore';
+import router from '@/routers';
+
+const authStore = useAuthStore();
+
+async function logout() {
+  try {
+    await authStore.logout();
+    alert('로그아웃 되었습니다.');
+    router.push('/login');
+  } catch (error) {
+    console.error(error);
+    alert('로그아웃 실패했습니다.');
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 .v-navigation-drawer,
