@@ -16,10 +16,9 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // 로그인 처리
-  // 로그인 처리
   const login = async formData => {
     try {
-      const response = await apiClient.post('/login', formData);
+      const response = await apiClient.post('/login', formData, { _skipInterceptor: true });
 
       if (response.status === 200 && response.data.data?.length) {
         Object.assign(tokenInfo, response.data.data[0]);
@@ -27,13 +26,15 @@ export const useAuthStore = defineStore('auth', () => {
         return response.data;
       }
 
-      throw new Error(response.data.message || '로그인 실패');
+      throw new Error(response.data.message);
     } catch (error) {
-      // 콘솔 확인용
-      console.error('[Login Error Raw]', error.response?.data);
+      // 백엔드에서 보낸 에러 메시지 추출
+      const backendMessage = error.response?.data?.message;
 
-      // 그대로 던져버림 (Error로 감싸지 않음!)
-      throw error;
+      console.error('[Login Error Raw]', backendMessage);
+
+      // 프론트 UI에서 바로 쓸 수 있게 메시지 전달
+      throw new Error(backendMessage);
     }
   };
 
@@ -44,7 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const response = await apiClient.post(
       '/refresh',
-      { refreshToken: savedRefreshToken }, // JSON body
+      { refreshToken: savedRefreshToken },
       { _skipInterceptor: true },
     );
     if (response.status === 200) {
@@ -99,6 +100,26 @@ export const useAuthStore = defineStore('auth', () => {
     return response.data;
   };
 
+  // 회원탈퇴
+  const deleted = async formData => {
+    const payload = {
+      email: formData.email,
+    };
+
+    const response = await apiClient.patch('/user/me', payload, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo.accessToken}`,
+      },
+    });
+
+    if (response.status === 200) {
+      performLogout();
+      localStorage.removeItem('refreshToken');
+    }
+
+    return response.data;
+  };
+
   return {
     tokenInfo,
     login,
@@ -107,5 +128,6 @@ export const useAuthStore = defineStore('auth', () => {
     performLogout,
     sendEmail,
     signUp,
+    deleted,
   };
 });

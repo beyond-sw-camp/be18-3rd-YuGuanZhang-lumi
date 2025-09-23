@@ -38,7 +38,7 @@
     <v-spacer />
     <v-btn variant="plain"> 사용자 이름 </v-btn>
     <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>
-    <v-btn icon><v-icon>mdi-cog</v-icon></v-btn>
+    <v-btn icon @click="$router.push('/setting')"><v-icon>mdi-cog</v-icon></v-btn>
   </v-app-bar>
 
   <v-main class="d-flex align-center justify-center">
