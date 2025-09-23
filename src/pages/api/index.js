@@ -45,7 +45,7 @@ apiClient.interceptors.response.use(
 
     // 백엔드에서 내려주는 메시지를 그대로 UI로 전달
     if (backendMessage) {
-      return Promise.reject(error); // 메시지가 있으면 refresh 시도하지 않고 그대로 전달
+      throw error; // 메시지가 있으면 refresh 시도하지 않고 그대로 전달
     }
 
     // 401 발생 시 refresh 토큰 재발급
@@ -56,11 +56,11 @@ apiClient.interceptors.response.use(
         return apiClient(originConfig);
       } catch (refreshError) {
         authStore.performLogout();
-        return Promise.reject(refreshError);
+        throw refreshError;
       }
     }
 
-    return Promise.reject(error);
+    throw error;
   },
 );
 
