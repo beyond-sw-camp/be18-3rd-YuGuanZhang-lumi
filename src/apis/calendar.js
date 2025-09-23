@@ -32,3 +32,17 @@ export async function updateTodo(todoId, param) {
 export async function deleteTodo(todoId) {
   await apiClient.delete(`todos/${todoId}`);
 }
+
+export async function getCalendars(startDate, endDate) {
+  const { data } = await apiClient.get(`calendars/`, {
+    params: { startDate, endDate },
+  });
+
+  return data.data;
+}
+
+export async function getCalendar(date) {
+  const { data } = await apiClient.get(`calendars/${date}`);
+
+  return data.data;
+}

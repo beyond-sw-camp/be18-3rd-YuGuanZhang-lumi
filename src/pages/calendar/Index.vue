@@ -1,7 +1,6 @@
 <template>
   <v-container fluid>
     <v-row>
-      <!-- 달력 -->
       <v-col cols="8">
         <vue-cal
           event-count
@@ -10,9 +9,18 @@
           view="month"
           @cell-click="onDateClick"
         />
-        <template #event-count="{ events: cellEvents }">
-          <span v-if="events.some(event => !event.allCompleted)">
-            {{ cellEvents.reduce((sum, event) => sum + (event.incompleteCount || 0), 0) }}
+        <template #event-count="{ eventCount }">
+          <!-- 그 날에 이벤트가 있다면 -->
+          <span v-if="events.length > 0">
+            <!-- allCompleted가 true면 체크 -->
+            <v-icon v-if="eventCount.every(e => e.allCompleted)" color="green" small>
+              mdi-check
+            </v-icon>
+
+            <!-- 아니면 미완료 개수 합산 -->
+            <span v-else>
+              {{ eventCount.reduce((sum, e) => sum + (e.incompleteCount || 0), 0) }}
+            </span>
           </span>
         </template>
       </v-col>
@@ -86,6 +94,55 @@
         </div>
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        <v-card class="overflow-auto" style="max-height: 470px; min-height: 200px">
+          <v-list class="py-0">
+            <!-- 일정 있음 -->
+            <template v-if="schedule && schedule.length > 0">
+              <template v-for="(item, i) in schedule" :key="`${item.entityType}-${item.entityId}`">
+                <v-divider v-if="i !== 0" />
+
+                <v-list-item>
+                  <v-list-item-content>
+                    <!-- 공통 헤더 -->
+                    <v-list-item-title>
+                      [{{ item.channelName }}] {{ item.entityType }} ({{ item.roleName }})
+                    </v-list-item-title>
+
+                    <!-- ASSIGNMENT -->
+                    <v-list-item-subtitle v-if="item.entityType === 'ASSIGNMENT'">
+                      마감일 : {{ item.deadlineAt || '-' }}<br />
+                      제출여부 : {{ item.isSubmission ? '제출완료' : '미제출' }}
+                    </v-list-item-subtitle>
+
+                    <!-- EVALUATION -->
+                    <v-list-item-subtitle v-else-if="item.entityType === 'EVALUATION'">
+                      마감일 : {{ item.evaluationDeadlineAt || '-' }}<br />
+                      제출여부 : {{ item.isSubmission ? '제출완료' : '미제출' }}
+                    </v-list-item-subtitle>
+
+                    <!-- COURSE -->
+                    <v-list-item-subtitle v-else-if="item.entityType === 'COURSE'">
+                      일정 : {{ item.startDate || '-' }} ~ {{ item.endDate || '-' }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </template>
+
+            <!-- 일정 없음 -->
+            <template v-else>
+              <v-list-item>
+                <v-list-item-content class="text-center text-grey">
+                  <v-list-item-title>등록된 일정이 없습니다.</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-list>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <v-dialog v-model="showDeleteModal" max-width="400">
       <v-card>
@@ -103,13 +160,23 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { VueCal } from 'vue-cal';
-import { createTodo, deleteTodo, getTodo, getTodos, updateTodo } from '@/apis/calendar';
+import {
+  createTodo,
+  deleteTodo,
+  getCalendar,
+  getCalendars,
+  getTodo,
+  getTodos,
+  updateTodo,
+} from '@/apis/calendar';
 import { useApi } from '@/composable/useApi';
 import formatDate from '@/utils/formatDate';
 import 'vue-cal/style';
 
 const events = ref([]);
 const tasks = ref([]);
+const schedules = ref([]);
+const schedule = ref();
 const newTask = ref(null);
 const selectedDate = ref(formatDate(new Date()));
 
@@ -123,6 +190,8 @@ const { data: todo, queryFnExecute: useGetTodo } = useApi(getTodo);
 const { queryFnExecute: useCreateTodo } = useApi(createTodo);
 const { queryFnExecute: useUpdateTodo } = useApi(updateTodo);
 const { queryFnExecute: useDeleteTodo } = useApi(deleteTodo);
+const { data: calendars, queryFnExecute: useGetCalendars } = useApi(getCalendars);
+const { data: calendar, queryFnExecute: useGetCalendar } = useApi(getCalendar);
 
 onMounted(async () => {
   await refreshData();
@@ -131,9 +200,11 @@ onMounted(async () => {
 async function refreshData(date = selectedDate.value) {
   await useGetTodos();
   await useGetTodo(date);
+  await useGetCalendar(date);
 
   if (!Array.isArray(todos.value)) return;
   if (!Array.isArray(todo.value)) return;
+  if (!Array.isArray(calendar.value)) return;
 
   events.value = todos.value.map(item => ({
     start: item.dueDate,
@@ -147,6 +218,22 @@ async function refreshData(date = selectedDate.value) {
     todoId: item.todoId,
     description: item.description,
     status: item.status,
+  }));
+
+  schedule.value = calendar.value.map(item => ({
+    channelId: item.channelId,
+    channelName: item.channelName,
+    entityId: item.entityId,
+    entityType: item.entityType,
+    roleName: item.roleName,
+    location: item.location,
+    statusType: item.statusType,
+    startDate: item.startDate,
+    endDate: item.endDate,
+    deadlineAt: item.deadlineAt,
+    isSubmission: item.isSubmission,
+    evaluationDeadlineAt: item.evaluationDeadlineAt,
+    isEvaluation: item.isEvaluation,
   }));
 }
 
