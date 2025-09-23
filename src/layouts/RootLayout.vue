@@ -36,7 +36,7 @@
   <v-app-bar class="bg-primary-lighten-1" elevation="0">
     <!-- 채널명 필요 -->
     <v-spacer />
-    <v-btn variant="plain"> 사용자 이름 </v-btn>
+    <span class="user-name">{{ userName }}</span>
     <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>
     <v-btn icon @click="$router.push('/setting')"><v-icon>mdi-cog</v-icon></v-btn>
   </v-app-bar>
@@ -51,9 +51,11 @@
 </template>
 <script setup>
 import { useAuthStore } from '@/pages/stores/authStore';
-import router from '@/routers';
+import { useRouter } from 'vue-router';
+import { onMounted, computed } from 'vue';
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 async function logout() {
   try {
@@ -65,6 +67,18 @@ async function logout() {
     alert('로그아웃 실패했습니다.');
   }
 }
+
+onMounted(async () => {
+  if (authStore.tokenInfo.accessToken) {
+    try {
+      await authStore.fetchProfile();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+});
+
+const userName = computed(() => authStore.tokenInfo.name);
 </script>
 
 <style lang="scss" scoped>
