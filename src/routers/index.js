@@ -9,8 +9,8 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Login from '@/pages/auth/';
 import { getChannel } from '@/apis/channel';
+import Login from '@/pages/auth/';
 import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
@@ -19,7 +19,7 @@ const routes = [
   { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
   { path: '/calendar', component: () => import('@/pages/calendar'), meta: { layout: 'root' } },
   { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
-  { path: '/setting', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
+  { path: '/profile', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
   {
     path: '/channels/:channelId/classes',
     component: () => import('@/pages/class'),

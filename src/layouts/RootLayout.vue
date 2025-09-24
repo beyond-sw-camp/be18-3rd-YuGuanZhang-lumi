@@ -17,13 +17,13 @@
         title="Calendar"
         to="/calendar"
       />
-      <v-list-item
+      <!-- <v-list-item
         color="primary"
         link
         prepend-icon="mdi-message-outline"
         title="Chat"
         to="/chats"
-      />
+      /> -->
     </v-list>
 
     <template #append>
@@ -34,11 +34,12 @@
     </template>
   </v-navigation-drawer>
   <v-app-bar class="bg-primary-lighten-1" elevation="0">
-    <!-- 채널명 필요 -->
     <v-spacer />
     <span class="user-name">{{ userName }}</span>
     <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>
-    <v-btn icon @click="$router.push('/setting')"><v-icon>mdi-cog</v-icon></v-btn>
+    <v-btn icon @click="profileDialog = true">
+      <v-icon>mdi-account-cog-outline</v-icon>
+    </v-btn>
   </v-app-bar>
 
   <v-main class="d-flex align-center justify-center">
@@ -48,14 +49,40 @@
       </v-sheet>
     </v-container>
   </v-main>
+
+  <v-dialog v-model="profileDialog" max-width="400">
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <span> 프로필 정보 </span>
+        <v-spacer />
+        <v-btn icon variant="text" @click="profileDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+
+      <v-card-text>
+        <v-container class="pa-0" fluid>
+          <v-row class="mb-2" no-gutters>
+            <v-col class="font-weight-bold" cols="2">이름</v-col>
+            <v-col cols="10">{{ authStore.tokenInfo.name }}</v-col>
+          </v-row>
+          <v-row class="mb-2" no-gutters>
+            <v-col class="font-weight-bold" cols="2">이메일</v-col>
+            <v-col cols="10">{{ authStore.tokenInfo.email }}</v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 <script setup>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
 const router = useRouter();
+const profileDialog = ref(false);
 
 async function logout() {
   try {
