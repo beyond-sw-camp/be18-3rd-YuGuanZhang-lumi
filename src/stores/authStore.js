@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
-import apiClient from '../api';
+import apiClient from '@/apis/apiClient';
 
 export const useAuthStore = defineStore('auth', () => {
   const tokenInfo = reactive({
