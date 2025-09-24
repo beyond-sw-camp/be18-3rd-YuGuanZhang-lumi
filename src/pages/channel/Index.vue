@@ -36,7 +36,13 @@
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { createChannel, deleteChannel, getChannels, updateChannel } from '@/apis/channel';
+import {
+  createChannel,
+  deleteChannel,
+  getChannel,
+  getChannels,
+  updateChannel,
+} from '@/apis/channel';
 
 import ChannelCard from './components/ChannelCard.vue';
 import ChannelDeleteModal from './components/ChannelDeleteModal.vue';
@@ -77,8 +83,13 @@ function openDeleteModal(channel) {
   deleteDialog.value = true;
 }
 
-function goToClasses(channel) {
-  router.push(`/channels/${channel.channelId}/classes`);
+async function goToClasses(channel) {
+  const singleChannel = await getChannel(channel.channelId);
+  if (singleChannel.roleName === 'TUTOR') {
+    router.push(`/channels/${channel.channelId}/classes`);
+  } else {
+    router.push(`/channels/${channel.channelId}/assignments`);
+  }
 }
 
 // ✅ 등록/수정 처리 (삼항 연산자 사용)

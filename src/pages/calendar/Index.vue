@@ -95,7 +95,7 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-card class="overflow-auto" style="max-height: 470px; min-height: 200px">
+        <v-card class="overflow-auto" style="max-height: 250px; min-height: 250px">
           <v-list class="py-0">
             <!-- 일정 있음 -->
             <template v-if="schedule && schedule.length > 0">
@@ -109,20 +109,32 @@
                   </v-list-item-title>
 
                   <!-- ASSIGNMENT -->
-                  <v-list-item-subtitle v-if="item.entityType === 'ASSIGNMENT'">
-                    마감일 : {{ item.deadlineAt || '-' }}<br />
+                  <v-list-item-subtitle
+                    v-if="item.entityType === 'ASSIGNMENT'"
+                    class="multi-line-subtitle"
+                  >
+                    마감일 : {{ item.deadlineAt || '-' }}
+                    <br />
                     제출여부 : {{ item.isSubmission ? '제출완료' : '미제출' }}
                   </v-list-item-subtitle>
 
                   <!-- EVALUATION -->
-                  <v-list-item-subtitle v-else-if="item.entityType === 'EVALUATION'">
-                    마감일 : {{ item.evaluationDeadlineAt || '-' }}<br />
+                  <v-list-item-subtitle
+                    v-else-if="item.entityType === 'EVALUATION'"
+                    class="multi-line-subtitle"
+                  >
+                    마감일 : {{ item.evaluationDeadlineAt || '-' }}
+                    <br />
                     제출여부 : {{ item.isSubmission ? '제출완료' : '미제출' }}
                   </v-list-item-subtitle>
 
                   <!-- COURSE -->
                   <v-list-item-subtitle v-else-if="item.entityType === 'COURSE'">
                     일정 : {{ item.startDate || '-' }} ~ {{ item.endDate || '-' }}
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle> 장소 : {{ item.location || '-' }} </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    출결 상태 : {{ item.statusType || '-' }}
                   </v-list-item-subtitle>
                 </v-list-item>
               </template>
@@ -226,7 +238,6 @@ async function createTask() {
       status: false,
       dueDate: selectedDate.value,
     });
-    console.log('created', created);
     tasks.value.push(created[0]);
     newTask.value = null;
   } catch (error) {
@@ -313,5 +324,11 @@ function cancelDelete() {
       align-self: flex-start;
     }
   }
+}
+
+.multi-line-subtitle {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
 }
 </style>

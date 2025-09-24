@@ -50,7 +50,7 @@
   </v-main>
 </template>
 <script setup>
-import { useAuthStore } from '@/pages/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import router from '@/routers';
 
 const authStore = useAuthStore();
