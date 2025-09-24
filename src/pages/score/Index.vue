@@ -34,7 +34,7 @@
           </thead>
           <tbody>
             <tr v-for="row in flatData" :key="row.gradeId">
-              <td>{{ row.date.split(' ')[0] }}</td>
+              <td>{{ row.date }}</td>
               <td>{{ row.title }}</td>
               <td>{{ row.grade }}</td>
               <td>
@@ -191,7 +191,7 @@ function getChartData(category) {
 
   if (category === '전체') {
     const allGrades = grades.value.flatMap(d => d.grades);
-    const labels = Array.from(new Set(allGrades.map(g => g.date.split(' ')[0]))).sort();
+    const labels = Array.from(new Set(allGrades.map(g => g.date))).sort();
 
     const datasets = grades.value.map(d => ({
       label: d.category,
@@ -209,7 +209,7 @@ function getChartData(category) {
   const categoryData = grades.value.find(d => d.category === category);
   if (!categoryData) return { labels: [], datasets: [] };
 
-  const labels = categoryData.grades.map(g => g.date.split(' ')[0]);
+  const labels = categoryData.grades.map(g => g.date);
   const dataset = {
     label: category,
     data: categoryData.grades.map(g => g.grade),
@@ -254,7 +254,7 @@ function openEdit(row) {
   editingId.value = row.gradeId;
   form.value = {
     grades: row.grade,
-    date: row.date.split(' ')[0],
+    date: row.date,
     title: row.title,
     category: row.category,
   };
@@ -266,15 +266,10 @@ async function submitForm() {
 
   if (!valid) return;
 
-  const payload = {
-    ...form.value,
-    date: `${form.value.date} 00:00:00`,
-  };
-
   try {
     await (editingId.value
-      ? useUpdateGrade(channelId, editingId.value, payload)
-      : useCreateGrade(channelId, payload));
+      ? useUpdateGrade(channelId, editingId.value, form.value)
+      : useCreateGrade(channelId, form.value));
     await useGetGrades(channelId);
   } catch (error) {
     console.error(editingId.value ? '수정 실패:' : '생성 실패:', error);
