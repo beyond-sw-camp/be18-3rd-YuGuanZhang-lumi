@@ -11,13 +11,11 @@
       </div>
 
       <div class="d-flex align-center">
-        <v-chip v-if="assignment.submission" class="mr-2" color="success" size="small">
-          제출 완료
+        <v-chip class="mr-2" :color="assignment.submission ? 'success' : 'warning'" size="small">
+          {{ assignment.submission ? '제출 완료' : '미제출' }}
         </v-chip>
-        <v-chip v-else class="mr-2" color="warning" size="small">미제출</v-chip>
-
-        <v-chip v-if="assignment.evaluation" class="mr-2" color="info" size="small">
-          평가 있음
+        <v-chip class="mr-2" :color="assignment.evaluation ? 'info' : 'grey'" size="small">
+          {{ assignment.evaluation ? '평가 있음' : '평가 없음' }}
         </v-chip>
 
         <!-- 역할별 버튼 -->

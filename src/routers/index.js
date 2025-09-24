@@ -29,7 +29,7 @@ const routes = [
     path: '/channels/:channelId/assignments',
     component: () => import('@/pages/assignment/Index.vue'),
     meta: { layout: 'root', subLayout: 'sublayout' },
-  },
+  }, // 과제 리스트 조회
   {
     path: '/channels/:channelId/assignments/new',
     component: () => import('@/pages/assignment/AssignmentCreate.vue'),
@@ -44,9 +44,23 @@ const routes = [
     path: '/channels/:channelId/assignments/:assignmentId',
     component: () => import('@/pages/assignment/AssignmentDetail.vue'),
     meta: { layout: 'root', subLayout: 'sublayout' },
-  }, // 단일 조회
-  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: ,   meta: { layout: 'root', subLayout: 'sublayout' }, }, 등록
-  // { path: '/channels/:channelId/assignments/:assignmentId/submissions/:submissionId/edit', component:  , meta: { layout: 'root', subLayout: 'sublayout' }, }, 수정(학생)
+  }, // 과제 단일 조회
+  {
+    path: '/channels/:channelId/assignments/:assignmentId/submissions/:submissionId',
+    component: () => import('@/pages/submission/Index.vue'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  }, // 제출 단일 조회
+  {
+    path: '/channels/:channelId/assignments/:assignmentId/submissions/new',
+    component: () => import('@/pages/submission/SubmissionCreate.vue'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  }, // 제출 등록
+  {
+    path: '/channels/:channelId/assignments/:assignmentId/submissions/:submissionId/edit',
+    component: () => import('@/pages/submission/SubmissionUpdate.vue'),
+    meta: { layout: 'root', subLayout: 'sublayout' },
+  }, // 수정(학생)
+
   // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: Submission,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 제출(학생)
   {
     path: '/channels/:channelId/materials',
