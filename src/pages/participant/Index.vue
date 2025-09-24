@@ -1,19 +1,38 @@
 <template>
   <div>
-    <v-btn color="primary" @click="dialog = true">초대발송</v-btn>
+    <!-- 🔹 참여자 목록 (모달 밖) -->
+    <v-card class="mb-4">
+      <v-card-title>참여자 목록</v-card-title>
+      <v-list dense>
+        <v-list-item v-for="user in participants" :key="user.userId">
+          <v-list-item-title>
+            {{ user.name || user.userId }} / {{ user.email || user.userId }} / ({{ user.roleName }})
+          </v-list-item-title>
+        </v-list-item>
 
-    <v-dialog v-model="dialog" max-width="400px">
+        <v-list-item v-if="participants.length === 0">
+          <v-list-item-title class="text-grey"> 참여자가 없습니다. </v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-card>
+
+    <!-- 🔹 초대발송 버튼 & 모달 -->
+    <v-btn color="primary" @click="openDialog">초대발송</v-btn>
+
+    <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title class="text-h6">
           {{ channel?.name || '초대 발송' }}
         </v-card-title>
 
+        <v-divider class="my-2" />
+
         <!-- 발송 성공 후 코드 보여주기 -->
         <div v-if="invitationCode" class="pa-4">
           <p class="text-subtitle-1">
             ✅ 초대 코드:
-            <strong
-              >{{ invitationCode }}<br />
+            <strong>
+              {{ invitationCode }}<br />
               유효기간 7일입니다.
             </strong>
           </p>
@@ -50,6 +69,7 @@
 
 <script>
 import { useAuthStore } from '../stores/authStore';
+import apiClient from '@/apis/apiClient';
 
 export default {
   name: 'InviteDialog',
@@ -65,15 +85,36 @@ export default {
       dialog: false,
       selectedRoleId: null,
       invitationCode: null,
+      participants: [], // 참여자 목록
       roles: [
         { id: 2, name: '학생' },
         { id: 3, name: '학부모' },
       ],
     };
   },
+  async mounted() {
+    await this.fetchParticipants(); // 페이지 들어올 때 목록 불러오기
+  },
+  mounted() {
+    this.fetchParticipants();
+  },
   methods: {
+    async openDialog() {
+      this.dialog = true;
+    },
+
+    async fetchParticipants() {
+      try {
+        const channelId = this.$route.params.channelId;
+        const res = await apiClient.get(`/channels/${channelId}/participants`);
+        this.participants = res.data?.data || [];
+        console.log('참여자 목록:', this.participants);
+      } catch (err) {
+        console.error('참여자 목록 불러오기 실패:', err);
+      }
+    },
+
     async sendInvitation() {
-      console.log('InviteDialog channel:', this.channel);
       try {
         const authStore = useAuthStore();
         const channelId = this.$route.params.channelId;
@@ -81,20 +122,43 @@ export default {
         const result = await authStore.sendInvitation(channelId, this.selectedRoleId);
         console.log('초대 발송 성공', result);
 
-        // 🔹 응답에서 초대 코드 추출
         if (result?.data?.[0]?.invitationCode) {
           this.invitationCode = result.data[0].invitationCode;
         }
 
         this.selectedRoleId = null;
+        await this.fetchParticipants(); // 갱신
       } catch (err) {
         console.error(err);
       }
     },
     closeDialog() {
       this.dialog = false;
-      this.invitationCode = null; // 닫을 때 초기화
+      this.invitationCode = null;
     },
+  },
+
+  async sendInvitation() {
+    try {
+      const authStore = useAuthStore();
+      const channelId = this.$route.params.channelId;
+
+      const result = await authStore.sendInvitation(channelId, this.selectedRoleId);
+      console.log('초대 발송 성공', result);
+
+      if (result?.data?.[0]?.invitationCode) {
+        this.invitationCode = result.data[0].invitationCode;
+      }
+
+      this.selectedRoleId = null;
+      await this.fetchParticipants(); // 초대 후 참여자 목록 갱신
+    } catch (err) {
+      console.error(err);
+    }
+  },
+  closeDialog() {
+    this.dialog = false;
+    this.invitationCode = null;
   },
 };
 </script>

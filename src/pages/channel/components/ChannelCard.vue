@@ -11,10 +11,6 @@
         <v-list elevation="0">
           <v-list-item @click="$emit('edit', channel)">수정</v-list-item>
           <v-list-item @click="$emit('delete', channel)">삭제</v-list-item>
-          <!-- 초대발송 모달 버튼 추가 -->
-          <v-list-item>
-            <Index :channel="channel" />
-          </v-list-item>
         </v-list>
       </v-menu>
     </div>
@@ -24,8 +20,6 @@
 </template>
 
 <script setup>
-import Index from '@/pages/participant/Index.vue';
-
 defineProps({
   channel: {
     type: Object,

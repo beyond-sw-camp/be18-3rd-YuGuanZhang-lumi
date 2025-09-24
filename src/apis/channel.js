@@ -25,3 +25,16 @@ export async function deleteChannel(channelId) {
   const { data } = await apiClient.delete(`/channels/${channelId}`);
   return data.data;
 }
+
+//  초대 코드로 채널 참가
+export async function joinChannel(code) {
+  try {
+    const response = await apiClient.post(`/channels/participants`, null, {
+      params: { code },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('채널 참가 실패:', error);
+    throw error;
+  }
+}
