@@ -29,6 +29,8 @@ defineProps({
   },
 });
 
+// console.log('channel', channel);
+
 // 이벤트: edit, delete를 부모에게 전달
 defineEmits(['edit', 'delete']);
 </script>

@@ -14,13 +14,14 @@ const apiClient = axios.create({
 //   - HTTP 요청이 서버로 전송되기 전에 실행된다.
 apiClient.interceptors.request.use(
   config => {
+    // @ts-ignore
     if (config._skipInterceptor) {
       return config;
     }
 
     // authStore에서 accessToken을 가져온다.
     const authStore = useAuthStore();
-    const accessToken = authStore.tokenInfo.accessToken; 
+    const accessToken = authStore.tokenInfo.accessToken;
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
