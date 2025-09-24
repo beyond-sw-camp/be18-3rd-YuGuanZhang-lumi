@@ -96,16 +96,14 @@
 
     <!-- 평가 있음 -->
     <div v-else class="mb-4">
-      <v-chip class="mb-2" color="info" size="small"> 점수: {{ evaluation.grade }} </v-chip>
+      <v-chip class="mb-4" color="info" size="small"> 점수: {{ evaluation.grade }} </v-chip>
       <div class="text-body-2 mb-2">
         {{ evaluation.feedback || '피드백 없음' }}
       </div>
 
       <div v-if="canWriteEvaluation" class="d-flex">
-        <v-btn class="mr-2" color="primary" size="small" @click="openEval('edit')">수정</v-btn>
-        <v-btn color="red" size="small" variant="text" @click="confirmEvalDelete = true"
-          >삭제</v-btn
-        >
+        <v-btn class="mr-2" color="#ffe8ff" @click="openEval('edit')">수정</v-btn>
+        <v-btn color="red" @click="confirmEvalDelete = true">삭제</v-btn>
       </div>
     </div>
 

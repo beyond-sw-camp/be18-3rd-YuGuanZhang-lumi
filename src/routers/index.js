@@ -62,6 +62,10 @@ const routes = [
     meta: { layout: 'root', subLayout: 'sublayout' },
   }, // 수정(학생)
 
+  {
+    path: 
+  }
+
   // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: Submission,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 제출(학생)
   {
     path: '/channels/:channelId/materials',
