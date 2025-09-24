@@ -55,8 +55,8 @@
                     </v-btn>
                   </template>
                   <v-list>
-                    <v-list-item @click="openEdit(row)">수정하기</v-list-item>
-                    <v-list-item @click="openDelete(row)">삭제하기</v-list-item>
+                    <v-list-item class="text-button" @click="openEdit(row)">수정하기</v-list-item>
+                    <v-list-item class="text-button" @click="openDelete(row)">삭제하기</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -74,41 +74,50 @@
       </v-list-item>
     </template>
 
-    <!-- 등록/수정 모달 -->
     <v-dialog v-model="formDialog" max-width="400">
       <v-card>
         <v-card-title>{{ editingId ? '성적 수정' : '성적 등록' }}</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="form.title"
-            class="small-input"
-            density="compact"
-            label="제목"
-            variant="outlined"
-          />
-          <v-text-field
-            v-model.number="form.grades"
-            class="small-input"
-            density="compact"
-            label="점수"
-            type="number"
-            variant="outlined"
-          />
-          <v-text-field
-            v-model="form.date"
-            class="small-input"
-            density="compact"
-            label="날짜"
-            type="date"
-            variant="outlined"
-          />
-          <v-select
-            v-model="form.category"
-            density="compact"
-            :items="['모의고사', '내신', '기타']"
-            label="카테고리"
-            variant="outlined"
-          />
+          <v-form ref="formRef">
+            <v-text-field
+              v-model="form.title"
+              class="small-input pb-4"
+              density="compact"
+              label="제목"
+              :rules="[v => !!v || '제목을 입력하세요.']"
+              variant="outlined"
+            />
+            <v-text-field
+              v-model.number="form.grades"
+              class="small-input pb-4"
+              density="compact"
+              label="점수"
+              :rules="[
+                v => !!v || '점수를 입력하세요.',
+                v => (v >= 0 && v <= 100) || '0~100 사이여야 합니다.',
+              ]"
+              type="number"
+              variant="outlined"
+            />
+            <v-text-field
+              v-model="form.date"
+              class="small-input pb-4"
+              density="compact"
+              label="날짜"
+              :rules="[v => !!v || '날짜를 선택하세요.']"
+              type="date"
+              variant="outlined"
+            />
+            <v-select
+              v-model="form.category"
+              class="small-input pb-4"
+              density="compact"
+              :items="['모의고사', '내신', '기타']"
+              label="카테고리"
+              :rules="[v => !!v || '카테고리를 선택하세요.']"
+              variant="outlined"
+            />
+          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -151,6 +160,7 @@ const channelId = Number(useRoute().params.channelId);
 const selectedCategory = ref('전체');
 const chartCanvas = ref(null);
 let chartInstance = null;
+const formRef = ref(null);
 
 const editingId = ref(null);
 const formDialog = ref(false);
@@ -249,6 +259,10 @@ function openEdit(row) {
 }
 
 async function submitForm() {
+  const { valid } = await formRef.value.validate();
+
+  if (!valid) return;
+
   const payload = {
     ...form.value,
     date: `${form.value.date} 00:00:00`,
