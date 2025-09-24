@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '@/pages/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api',
@@ -14,7 +14,6 @@ const apiClient = axios.create({
 //   - HTTP 요청이 서버로 전송되기 전에 실행된다.
 apiClient.interceptors.request.use(
   config => {
-    // @ts-ignore
     if (config._skipInterceptor) {
       return config;
     }

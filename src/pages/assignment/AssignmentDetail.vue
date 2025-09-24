@@ -1,89 +1,99 @@
 <template>
-  <v-container class="d-flex justify-center">
-    <v-card class="pa-6 rounded-xl shadow-lg" max-width="700" width="100%">
-      <!-- 제목 -->
-      <v-card-title class="text-h5 font-weight-bold mb-2">
-        {{ assignment.title }}
-      </v-card-title>
-      <v-divider class="mb-4" />
+  <v-container class="pa-6" fluid>
+    <!-- 제목 -->
+    <div class="text-h5 font-weight-bold mb-2">
+      {{ assignment.title }}
+    </div>
+    <v-divider class="mb-4" />
 
-      <!-- 과제 설명 -->
-      <v-card-text>
-        <div class="mb-4">
-          <p class="text-body-1">{{ assignment.content }}</p>
-        </div>
+    <!-- 기한 정보 -->
+    <v-row class="mb-4">
+      <v-col cols="12" md="6">
+        <strong>제출 마감일:</strong>
+        {{ formatDate(assignment.deadlineAt) }}
+      </v-col>
+    </v-row>
 
-        <!-- 기한 정보 -->
-        <v-row class="mb-4">
-          <v-col cols="12" md="6">
-            <strong>제출 마감일:</strong>
-            {{ formatDate(assignment.deadlineAt) }}
-          </v-col>
-          <v-col cols="12" md="6">
-            <strong>평가 마감일:</strong>
-            {{ formatDate(assignment.evaluationDeadlineAt) }}
-          </v-col>
-        </v-row>
+    <!-- 과제 설명 -->
 
-        <!-- 상태 -->
-        <div class="mb-4">
-          <v-chip class="mr-2" :color="assignment.submission ? 'success' : 'warning'" size="small">
-            {{ assignment.submission ? '제출 가능' : '제출 불가' }}
-          </v-chip>
-          <v-chip :color="assignment.evaluation ? 'info' : 'grey'" size="small">
-            {{ assignment.submission ? '평가 있음' : '평가 없음' }}
-          </v-chip>
-        </div>
+    <div class="mb-4">
+      <p class="text-body-1">{{ assignment.content }}</p>
+    </div>
 
-        <!-- 첨부 파일 -->
-        <div v-if="assignment.files.length > 0" class="mb-4">
-          <h4 class="text-subtitle-1 font-weight-bold">첨부 파일</h4>
-          <v-list>
-            <v-list-item
-              v-for="file in assignment.files"
-              :key="file.id"
-              :subtitle="(file.size / 1024).toFixed(1) + ' KB'"
-              :title="file.name"
-              @click="downloadFile(file)"
-            >
-              <template #prepend>
-                <v-icon>mdi-file</v-icon>
-              </template>
-              <template #append>
-                <v-btn color="primary" icon size="small" @click.stop="downloadFile(file)">
-                  <v-icon>mdi-download</v-icon>
-                </v-btn>
-              </template>
-            </v-list-item>
-          </v-list>
-        </div>
+    <!-- 상태 -->
+    <div class="mb-4">
+      <v-chip class="mr-2" :color="assignment.submission ? 'success' : 'warning'" size="small">
+        {{ assignment.submission ? '제출 완료' : '미제출' }}
+      </v-chip>
+      <v-chip class="mr-2" :color="assignment.evaluation ? 'info' : 'grey'" size="small">
+        {{ assignment.evaluation ? '평가 있음' : '평가 없음' }}
+      </v-chip>
+    </div>
 
-        <v-divider class="my-4" />
-
-        <!-- 역할별 버튼 -->
-        <div class="d-flex justify-end">
-          <!-- 교사 -->
-          <template v-if="userRole === 'TEACHER'">
-            <v-btn class="mr-2" color="primary" @click="goToEdit"> 수정 </v-btn>
-            <v-btn color="red" @click="openDeleteModal">삭제</v-btn>
+    <!-- 첨부 파일 -->
+    <div v-if="assignment.files.length > 0" class="mb-4">
+      <h4 class="text-subtitle-1 font-weight-bold">첨부 파일</h4>
+      <v-list>
+        <v-list-item v-for="file in assignment.files" :key="file.fileId" :title="file.fileName">
+          <template #prepend>
+            <v-icon>mdi-file</v-icon>
           </template>
-
-          <!-- 학생 -->
-          <template v-else-if="userRole === 'STUDENT'">
-            <v-btn color="primary" @click="handleSubmit">제출</v-btn>
+          <template #append>
+            <v-btn color="primary" icon size="small" @click.stop="download(file)">
+              <v-icon>mdi-download</v-icon>
+            </v-btn>
           </template>
-        </div>
-      </v-card-text>
-    </v-card>
+        </v-list-item>
+      </v-list>
+    </div>
+
+    <v-divider class="my-6" />
+    <!-- 역할별 버튼 -->
+    <!-- 제출 영역 -->
+    <!-- 학생: 제출이 없으면 제출 폼 -->
+    <!-- 학생: 제출 없을 때 -->
+    <SubmissionCreate
+      v-if="channel?.roleName === 'STUDENT' && !submission"
+      mode="create"
+      @submitted="handleCreate"
+    />
+
+    <!-- 제출 있음 -->
+    <SubmissionIndex
+      v-else-if="submission"
+      :assignment="assignment"
+      :channel="channel"
+      :submission="submission"
+      @delete="handleDelete"
+      @edit="handleUpdate"
+    />
+
+    <!-- 교사인데 제출 없음 -->
+    <div v-else-if="channel?.roleName === 'TUTOR'" class="text-grey">아직 제출이 없습니다.</div>
+
+    <!-- 과제 삭제 모달 -->
+    <AssignmentDeleteModal
+      v-model="deleteDialog"
+      :assignment="assignment"
+      @confirm="confirmDelete"
+    />
   </v-container>
-  <!-- 삭제 모달 -->
-  <AssignmentDeleteModal v-model="deleteDialog" :assignment="assignment" @confirm="confirmDelete" />
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAssignment, getAssignment } from '@/apis/assignment';
+import { getChannel } from '@/apis/channel';
+import { downloadFile } from '@/apis/file';
+import {
+  createSubmission,
+  deleteSubmission,
+  getSubmission,
+  updateSubmission,
+} from '@/apis/submission';
+import SubmissionIndex from '@/pages/submission/Index.vue';
+import SubmissionCreate from '@/pages/submission/SubmissionCreate.vue';
 import AssignmentDeleteModal from './components/AssignmentDeleteModal.vue';
 
 const route = useRoute();
@@ -92,43 +102,45 @@ const router = useRouter();
 const channelId = route.params.channelId;
 const assignmentId = route.params.assignmentId;
 
+const channel = ref(null);
+
 console.log('assignmentId:', assignmentId);
 
-const userRole = ref('TEACHER');
-
-const assignment = ref({
-  assignmentId: null,
-  title: '',
-  content: '',
-  deadlineAt: '',
-  evaluationDeadlineAt: '',
-  evaluation: false,
-  submission: false,
-  files: [],
-});
+const assignment = ref({ files: [] });
+const submission = ref(null);
 const deleteDialog = ref(false);
 
-onMounted(async () => {
+async function loadAssignment() {
   const data = await getAssignment(channelId, assignmentId);
-  assignment.value = Array.isArray(data) ? data[0] : data; // 배열 방어 처리
-});
+  assignment.value = Array.isArray(data) ? data[0] : data;
+}
+
+async function loadSubmission() {
+  try {
+    const data = await getSubmission(channelId, assignmentId);
+    console.log('getSubmission 응답:', data);
+
+    submission.value = Array.isArray(data) ? data[0] : data;
+  } catch (error) {
+    console.log(error);
+
+    submission.value = null; // 제출 없음
+  }
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return '-';
   return dateStr.split(' ')[0].replace(/-/g, '.'); // yyyy.MM.dd
 }
 
-function downloadFile(file) {
+function download(file) {
   console.log('파일 다운로드:', file);
   // TODO: 실제 다운로드 API 연동
+  downloadFile(file.fileId, file.fileName);
 }
 
 function goToEdit() {
   router.push(`/channels/${channelId}/assignments/${assignmentId}/edit`);
-}
-
-function openDeleteModal() {
-  deleteDialog.value = true;
 }
 
 async function confirmDelete() {
@@ -136,10 +148,39 @@ async function confirmDelete() {
   router.push(`/channels/${channelId}/assignments`);
 }
 
-function handleSubmit() {
-  console.log('학생 제출 기능 호출');
-  // TODO: 제출 API 붙이기
+/* ---- 제출 관련 핸들러 ---- */
+
+// 제출 생성
+async function handleCreate(payload) {
+  const newSubmission = await createSubmission(channelId, assignmentId, payload);
+  submission.value = newSubmission;
 }
+
+// 제출 수정
+async function handleUpdate(payload) {
+  if (!submission.value) return;
+  const updated = await updateSubmission(
+    channelId,
+    assignmentId,
+    submission.value.submissionId,
+    payload,
+  );
+  submission.value = updated;
+}
+
+// 제출 삭제
+async function handleDelete() {
+  if (!submission.value) return;
+  await deleteSubmission(channelId, assignmentId, submission.value.submissionId);
+  submission.value = null;
+}
+
+onMounted(async () => {
+  loadAssignment();
+  loadSubmission();
+  channel.value = await getChannel(channelId);
+  console.log('채널 확인', channel.value);
+});
 </script>
 
 <style scoped>

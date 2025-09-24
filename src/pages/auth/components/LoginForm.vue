@@ -40,7 +40,6 @@ function togglePassword() {
 }
 
 function submitClick() {
-  console.log(toRaw(formData));
   emit('form-submit', toRaw(formData));
 }
 </script>

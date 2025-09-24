@@ -3,7 +3,7 @@
     <!-- 카드 헤더 (채널명 + 캐밥 버튼) -->
     <div class="d-flex justify-space-between align-center mb-2">
       <h3>{{ channel.name }}</h3>
-      <v-menu>
+      <v-menu v-if="channel?.roleName === 'TUTOR'">
         <template #activator="{ props }">
           <v-btn color="#ffe8ff" elevation="0" v-bind="props">
             <v-icon>mdi-dots-vertical</v-icon>

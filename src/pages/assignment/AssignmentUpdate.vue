@@ -111,7 +111,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getAssignment, updateAssignment } from '@/apis/assignment';
-
+import { deleteFile, uploadFiles } from '@/apis/file';
 const route = useRoute();
 const router = useRouter();
 
@@ -129,26 +129,6 @@ const form = ref({
 const existingFiles = ref([]);
 // 새로 추가할 파일
 const newFiles = ref([]);
-
-// // 페이지 진입 시 과제 데이터 불러오기 (지금은 더미)
-// onMounted(() => {
-//   console.log('수정할 과제 ID:', assignmentId);
-//   // TODO: 나중에 axios.get(`/api/channels/${channelId}/assignments/${assignmentId}`)
-//   //       .then(res => form.value = res.data)
-//   form.value = {
-//     content: '엔티티 매핑과 연관관계 매핑을 학습하는 과제입니다.',
-//     deadlineAt: '2025-10-01',
-//     evaluation: true,
-//     evaluationDeadlineAt: '2025-10-08',
-//     files: [],
-//     submission: false,
-//     title: 'JPA 과제 수정본',
-//   };
-//   existingFiles.value = [
-//     { id: 101, name: '과제안내.pdf' },
-//     { id: 102, name: '예시코드.zip' },
-//   ];
-// });
 
 // 기존 데이터 불러오기
 async function loadAssignment() {
@@ -170,16 +150,24 @@ onMounted(() => loadAssignment());
 console.log('확인2', form.value);
 
 async function handleUpdate() {
+  let newFileIds = [];
+  if (newFiles.value.length > 0) {
+    const uploaded = await uploadFiles('ASSIGNMENT', newFiles.value);
+    newFileIds = uploaded.map(f => f.fileId);
+  }
   console.log('수정할 데이터:', form.value);
   console.log('삭제된 파일:', existingFiles.value); // TODO: 실제 삭제 목록 처리
   console.log('추가된 파일:', newFiles.value); // TODO: FormData로 전송
   // TODO: 나중에 axios.put(`/api/channels/${channelId}/assignments/${assignmentId}`, formData)
+  // 기존 파일 중 삭제되지 않은 것만 남기기
+  const keptFileIds = existingFiles.value.map(f => f.fileId);
+
   const payload = {
     title: form.value.title,
     content: form.value.content,
     deadlineAt: form.value.deadlineAt.replace('T', ' ') + ':00',
     isEvaluation: form.value.evaluation,
-    fileIds: [],
+    fileIds: [...keptFileIds, ...newFileIds],
   };
 
   await updateAssignment(channelId, assignmentId, payload);
