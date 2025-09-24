@@ -38,3 +38,8 @@ export async function joinChannel(code) {
     throw error;
   }
 }
+
+export async function getChannel(channelId) {
+  const { data } = await apiClient.get(`/channels/${channelId}`);
+  return data.data[0];
+}
