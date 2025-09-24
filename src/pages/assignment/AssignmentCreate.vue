@@ -93,6 +93,7 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { createAssignment } from '@/apis/assignment';
+import { uploadFiles } from '@/apis/file';
 
 const route = useRoute();
 const router = useRouter();
@@ -111,13 +112,18 @@ const form = ref({
 // 과제 생성
 async function handleCreate() {
   try {
+    let fileIds = [];
+    if (form.value.files.length > 0) {
+      const uploaded = await uploadFiles('ASSIGNMENT', form.value.files);
+      fileIds = uploaded.map(f => f.fileId);
+    }
     // API에 맞는 payload 만들기
     const payload = {
       title: form.value.title,
       content: form.value.content,
       deadlineAt: form.value.deadlineAt.replace('T', ' ') + ':00', // "yyyy-MM-dd HH:mm:ss" 맞추기
       isEvaluation: form.value.evaluation,
-      fileIds: [], // 파일 업로드 기능 구현 전까지는 빈 배열
+      fileIds, // 파일 업로드 기능 구현 전까지는 빈 배열
     };
 
     await createAssignment(channelId, payload);

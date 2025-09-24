@@ -46,6 +46,7 @@ import {
   getChannels,
   updateChannel,
   joinChannel,
+  getChannel,
 } from '@/apis/channel';
 
 import ChannelCard from './components/ChannelCard.vue';

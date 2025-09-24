@@ -13,8 +13,8 @@
 
       <!-- 교사만 생성 버튼 -->
       <v-btn
-        v-if="userRole === 'TEACHER'"
-        color="primary"
+        v-if="channel?.roleName === 'TUTOR'"
+        color="#ffe8ff"
         elevation="0"
         rounded="xl"
         @click="goToCreate"
@@ -25,7 +25,7 @@
     <!-- 과제 목록 -->
     <AssignmentList
       :assignments="sortedAssignments"
-      :user-role="userRole"
+      :channel="channel"
       @click="goToDetail"
       @delete="openDeleteModal"
       @edit="goToEdit"
@@ -44,6 +44,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAssignment, getAssignments } from '@/apis/assignment';
+import { getChannel } from '@/apis/channel';
 import AssignmentDeleteModal from './components/AssignmentDeleteModal.vue';
 import AssignmentList from './components/AssignmentList.vue';
 
@@ -53,45 +54,18 @@ const router = useRouter();
 const channelId = route.params.channelId;
 console.log(channelId);
 
+const channel = ref(null);
+
 // 상태
 const assignments = ref([]);
 const sortOrder = ref('최신순'); // 정렬 옵션
 const deleteDialog = ref(false);
 const selectedAssignment = ref(null);
 
-// ✅ 나중에는 로그인한 사용자 정보에서 role 가져오기
-const userRole = ref('TEACHER'); // "TEACHER" | "STUDENT" | "PARENT"
-
 // 목록 불러오기
 async function loadAssignments() {
   assignments.value = await getAssignments(channelId);
 }
-
-// ✅ 더미 데이터 (나중에 axios로 대체)
-// const assignments = ref([
-//   {
-//     assignmentId: 2,
-//     title: 'JPA 과제2',
-//     content: '엔티티 매핑과 연관관계 매핑을 학습하는 과제입니다.',
-//     deadlineAt: '2025-10-01',
-//     evaluationDeadlineAt: '2025-10-08',
-//     evaluation: true,
-//     submission: false,
-//     createdAt: '2025-09-22T10:12:33',
-//     updatedAt: '2025-09-23T18:45:00',
-//   },
-//   {
-//     assignmentId: 3,
-//     title: 'JPA 과제e2',
-//     content: '엔티티 매핑과 연관관계 매핑을 학습하는 과제입니다.',
-//     deadlineAt: '2025-10-03',
-//     evaluationDeadlineAt: '2025-10-08',
-//     evaluation: true,
-//     submission: true,
-//     createdAt: '2025-09-22T11:00:00',
-//     updatedAt: '2025-09-23T20:30:00',
-//   },
-// ]);
 
 // 정렬된 목록
 const sortedAssignments = computed(() => {
@@ -123,7 +97,11 @@ async function handleDelete(assignment) {
   deleteDialog.value = false;
 }
 
-onMounted(() => loadAssignments());
+onMounted(async () => {
+  await loadAssignments();
+  channel.value = await getChannel(channelId);
+  console.log('채널 확인', channel.value);
+});
 </script>
 
 <style lang="scss" scoped>

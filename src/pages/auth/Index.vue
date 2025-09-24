@@ -5,7 +5,7 @@
         <v-card class="card-container" elevation="10">
           <!-- 로그인 폼 -->
           <v-card class="form-card sign-in" :class="{ active: isSignUpActive }">
-            <v-card-title class="justify-center">Sign In</v-card-title>
+            <v-card-title class="justify-center">로그인</v-card-title>
             <v-card-text>
               <LoginForm @form-submit="handleLogin" />
             </v-card-text>
@@ -26,8 +26,14 @@
           <div class="overlay" :class="{ 'right-active': isSignUpActive }">
             <div class="overlay-bg"></div>
             <div class="overlay-panel">
-              <h1>Sign up</h1>
-              <v-btn color="white" outlined @click="toggleForm">회원가입</v-btn>
+              <div v-if="isSignUpActive">
+                <h1>Sign In</h1>
+                <v-btn color="white" outlined @click="toggleForm">로그인</v-btn>
+              </div>
+              <div v-else>
+                <h1>Sign up</h1>
+                <v-btn color="white" outlined @click="toggleForm">회원가입</v-btn>
+              </div>
             </div>
           </div>
         </v-card>
@@ -39,9 +45,9 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import LoginForm from '../auth/LoginForm.vue';
-import SignupForm from '../auth/SignupForm.vue';
-import { useAuthStore } from '../stores/authStore';
+import LoginForm from '@/pages/auth/components/LoginForm.vue';
+import SignupForm from '@/pages/auth/components/SignupForm.vue';
+import { useAuthStore } from '@/stores/authStore';
 
 const isSignUpActive = ref(false);
 const router = useRouter();

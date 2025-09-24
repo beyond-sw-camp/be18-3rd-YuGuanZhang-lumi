@@ -2,7 +2,7 @@
   <v-card v-if="channel" class="channel-card pa-4" rounded-2xl>
     <div class="d-flex justify-space-between align-center mb-2">
       <h3>{{ channel.name }}</h3>
-      <v-menu>
+      <v-menu v-if="channel?.roleName === 'TUTOR'">
         <template #activator="{ props }">
           <v-btn color="#ffe8ff" elevation="0" v-bind="props">
             <v-icon>mdi-dots-vertical</v-icon>

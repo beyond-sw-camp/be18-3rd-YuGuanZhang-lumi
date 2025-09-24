@@ -22,7 +22,7 @@ export async function createTodo(param) {
 }
 
 export async function updateTodo(todoId, param) {
-  const { data } = await apiClient.patch(`todos/${todoId}`, {
+  const { data } = await apiClient.patch(`/todos/${todoId}`, {
     description: param.description,
     status: param.status,
   });
@@ -30,11 +30,11 @@ export async function updateTodo(todoId, param) {
 }
 
 export async function deleteTodo(todoId) {
-  await apiClient.delete(`todos/${todoId}`);
+  await apiClient.delete(`/todos/${todoId}`);
 }
 
 export async function getCalendars(startDate, endDate) {
-  const { data } = await apiClient.get(`calendars?`, {
+  const { data } = await apiClient.get(`/calendars?`, {
     params: { startDate, endDate },
   });
 
@@ -42,7 +42,7 @@ export async function getCalendars(startDate, endDate) {
 }
 
 export async function getCalendar(date) {
-  const { data } = await apiClient.get(`calendars/${date}`);
+  const { data } = await apiClient.get(`/calendars/${date}`);
 
   return data.data;
 }

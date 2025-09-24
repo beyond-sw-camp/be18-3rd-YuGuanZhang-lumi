@@ -1,7 +1,14 @@
+<<<<<<< HEAD:src/pages/stores/authStore.js
 // stores/authStore.js
 import apiClient from '@/apis/apiClient';
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+=======
+// @ts-nocheck
+import { defineStore } from 'pinia';
+import { reactive } from 'vue';
+import apiClient from '@/apis/apiClient';
+>>>>>>> develop:src/stores/authStore.js
 
 export const useAuthStore = defineStore('auth', () => {
   // --- 상태 초기화 ---
