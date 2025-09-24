@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 상단 등록하기 버튼 -->
-    <div class="d-flex justify-end mb-4">
+    <div class="d-flex justify-end mb-4 mt-4 mr-4">
       <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal"> 채널 등록하기 </v-btn>
     </div>
 
