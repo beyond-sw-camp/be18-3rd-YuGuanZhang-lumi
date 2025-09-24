@@ -7,7 +7,6 @@
         <div class="text-caption mt-1">
           생성: {{ assignment.createdAt }} / 수정: {{ assignment.updatedAt }}
         </div>
-        <div class="text-caption mt-1">{{ assignment.content }}</div>
       </div>
 
       <div class="d-flex align-center">
@@ -19,7 +18,7 @@
         </v-chip>
 
         <!-- 역할별 버튼 -->
-        <template v-if="userRole === 'TEACHER'">
+        <template v-if="channel?.roleName === 'TUTOR'">
           <v-btn
             class="mr-2"
             color="primary"
@@ -32,7 +31,12 @@
             >삭제</v-btn
           >
         </template>
-        <v-btn v-else-if="userRole === 'STUDENT'" color="primary" size="small" variant="flat">
+        <v-btn
+          v-else-if="channel?.roleName === 'STUDENT'"
+          color="primary"
+          size="small"
+          variant="flat"
+        >
           제출
         </v-btn>
       </div>
@@ -43,7 +47,7 @@
 <script setup>
 defineProps({
   assignment: Object,
-  userRole: String,
+  channel: { type: Object, default: () => ({}) },
 });
 defineEmits(['edit', 'delete', 'click']);
 </script>

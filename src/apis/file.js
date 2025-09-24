@@ -1,18 +1,5 @@
-import api from './axios';
+import apiClient from './apiClient';
 
-// 파일 업로드 (type: ASSIGNMENT, SUBMISSION 등)
-// export async function uploadFiles(type, files) {
-//   const formData = new FormData();
-//   for (const file of files) {
-//     formData.append('file', file);
-//   }
-
-//   const { data } = await api.post(`/${type}/files/upload`, formData, {
-//     headers: { 'Content-Type': 'multipart/form-data' },
-//   });
-
-//   return data.data; // [{fileId, fileName}, ...]
-// }
 export async function uploadFiles(type, files) {
   const formData = new FormData();
   formData.append('type', type); // 필요하다면 enum 값도 같이 보냄
@@ -22,7 +9,7 @@ export async function uploadFiles(type, files) {
     formData.append('file', file);
   }
 
-  const res = await api.post(`/${type}/files/upload`, formData, {
+  const res = await apiClient.post(`/${type}/files/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
@@ -31,13 +18,13 @@ export async function uploadFiles(type, files) {
 
 // 파일 삭제
 export async function deleteFile(fileId) {
-  const { data } = await api.delete(`/files/${fileId}`);
+  const { data } = await apiClient.delete(`/files/${fileId}`);
   return data;
 }
 
 // 파일 다운로드
 export async function downloadFile(fileId, fileName) {
-  const res = await api.get(`/files/${fileId}/download`, {
+  const res = await apiClient.get(`/files/${fileId}/download`, {
     responseType: 'blob',
   });
 

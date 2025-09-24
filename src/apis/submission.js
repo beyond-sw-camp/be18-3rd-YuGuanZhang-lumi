@@ -1,7 +1,7 @@
-import api from './axios';
+import apiClient from './apiClient';
 
 export async function createSubmission(channelId, assignmentId, payload) {
-  const { data } = await api.post(
+  const { data } = await apiClient.post(
     `/channels/${channelId}/assignments/${assignmentId}/submissions`,
     payload,
   );
@@ -9,12 +9,14 @@ export async function createSubmission(channelId, assignmentId, payload) {
 }
 
 export async function getSubmission(channelId, assignmentId) {
-  const { data } = await api.get(`/channels/${channelId}/assignments/${assignmentId}/submissions`);
+  const { data } = await apiClient.get(
+    `/channels/${channelId}/assignments/${assignmentId}/submissions`,
+  );
   return Array.isArray(data.data) ? data.data[0] : data.data;
 }
 
 export async function updateSubmission(channelId, assignmentId, submissionId, payload) {
-  const { data } = await api.put(
+  const { data } = await apiClient.put(
     `/channels/${channelId}/assignments/${assignmentId}/submissions/${submissionId}`,
     payload,
   );
@@ -22,7 +24,7 @@ export async function updateSubmission(channelId, assignmentId, submissionId, pa
 }
 
 export async function deleteSubmission(channelId, assignmentId, submissionId) {
-  const { data } = await api.delete(
+  const { data } = await apiClient.delete(
     `/channels/${channelId}/assignments/${assignmentId}/submissions/${submissionId}`,
   );
   return data.data;

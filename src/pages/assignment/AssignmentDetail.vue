@@ -53,7 +53,7 @@
     <!-- 학생: 제출이 없으면 제출 폼 -->
     <!-- 학생: 제출 없을 때 -->
     <SubmissionCreate
-      v-if="userRole === 'STUDENT' && !submission"
+      v-if="channel?.roleName === 'STUDENT' && !submission"
       mode="create"
       @submitted="handleCreate"
     />
@@ -61,14 +61,15 @@
     <!-- 제출 있음 -->
     <SubmissionIndex
       v-else-if="submission"
+      :assignment="assignment"
+      :channel="channel"
       :submission="submission"
-      :user-role="userRole"
       @delete="handleDelete"
       @edit="handleUpdate"
     />
 
     <!-- 교사인데 제출 없음 -->
-    <div v-else-if="userRole === 'TEACHER'" class="text-grey">아직 제출이 없습니다.</div>
+    <div v-else-if="channel?.roleName === 'TUTOR'" class="text-grey">아직 제출이 없습니다.</div>
 
     <!-- 과제 삭제 모달 -->
     <AssignmentDeleteModal
@@ -83,6 +84,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAssignment, getAssignment } from '@/apis/assignment';
+import { getChannel } from '@/apis/channel';
 import { downloadFile } from '@/apis/file';
 import {
   createSubmission,
@@ -100,10 +102,9 @@ const router = useRouter();
 const channelId = route.params.channelId;
 const assignmentId = route.params.assignmentId;
 
-console.log('assignmentId:', assignmentId);
+const channel = ref(null);
 
-// TODO: 실제 로그인 유저 역할 연결
-const userRole = ref('STUDENT');
+console.log('assignmentId:', assignmentId);
 
 const assignment = ref({ files: [] });
 const submission = ref(null);
@@ -117,6 +118,8 @@ async function loadAssignment() {
 async function loadSubmission() {
   try {
     const data = await getSubmission(channelId, assignmentId);
+    console.log('getSubmission 응답:', data);
+
     submission.value = Array.isArray(data) ? data[0] : data;
   } catch (error) {
     console.log(error);
@@ -172,9 +175,11 @@ async function handleDelete() {
   submission.value = null;
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadAssignment();
   loadSubmission();
+  channel.value = await getChannel(channelId);
+  console.log('채널 확인', channel.value);
 });
 </script>
 

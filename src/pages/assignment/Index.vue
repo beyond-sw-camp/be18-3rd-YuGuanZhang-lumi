@@ -13,7 +13,7 @@
 
       <!-- 교사만 생성 버튼 -->
       <v-btn
-        v-if="userRole === 'TEACHER'"
+        v-if="channel?.roleName === 'TUTOR'"
         color="primary"
         elevation="0"
         rounded="xl"
@@ -25,7 +25,7 @@
     <!-- 과제 목록 -->
     <AssignmentList
       :assignments="sortedAssignments"
-      :user-role="userRole"
+      :channel="channel"
       @click="goToDetail"
       @delete="openDeleteModal"
       @edit="goToEdit"
@@ -44,6 +44,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAssignment, getAssignments } from '@/apis/assignment';
+import { getChannel } from '@/apis/channel';
 import AssignmentDeleteModal from './components/AssignmentDeleteModal.vue';
 import AssignmentList from './components/AssignmentList.vue';
 
@@ -53,14 +54,13 @@ const router = useRouter();
 const channelId = route.params.channelId;
 console.log(channelId);
 
+const channel = ref(null);
+
 // 상태
 const assignments = ref([]);
 const sortOrder = ref('최신순'); // 정렬 옵션
 const deleteDialog = ref(false);
 const selectedAssignment = ref(null);
-
-// ✅ 나중에는 로그인한 사용자 정보에서 role 가져오기
-const userRole = ref('TEACHER'); // "TEACHER" | "STUDENT" | "PARENT"
 
 // 목록 불러오기
 async function loadAssignments() {
@@ -97,7 +97,11 @@ async function handleDelete(assignment) {
   deleteDialog.value = false;
 }
 
-onMounted(() => loadAssignments());
+onMounted(async () => {
+  await loadAssignments();
+  channel.value = await getChannel(channelId);
+  console.log('채널 확인', channel.value);
+});
 </script>
 
 <style lang="scss" scoped>
