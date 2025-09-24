@@ -67,32 +67,6 @@ async function loadAssignments() {
   assignments.value = await getAssignments(channelId);
 }
 
-// ✅ 더미 데이터 (나중에 axios로 대체)
-// const assignments = ref([
-//   {
-//     assignmentId: 2,
-//     title: 'JPA 과제2',
-//     content: '엔티티 매핑과 연관관계 매핑을 학습하는 과제입니다.',
-//     deadlineAt: '2025-10-01',
-//     evaluationDeadlineAt: '2025-10-08',
-//     evaluation: true,
-//     submission: false,
-//     createdAt: '2025-09-22T10:12:33',
-//     updatedAt: '2025-09-23T18:45:00',
-//   },
-//   {
-//     assignmentId: 3,
-//     title: 'JPA 과제e2',
-//     content: '엔티티 매핑과 연관관계 매핑을 학습하는 과제입니다.',
-//     deadlineAt: '2025-10-03',
-//     evaluationDeadlineAt: '2025-10-08',
-//     evaluation: true,
-//     submission: true,
-//     createdAt: '2025-09-22T11:00:00',
-//     updatedAt: '2025-09-23T20:30:00',
-//   },
-// ]);
-
 // 정렬된 목록
 const sortedAssignments = computed(() => {
   return [...assignments.value].sort(
