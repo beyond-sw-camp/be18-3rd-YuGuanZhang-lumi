@@ -52,7 +52,7 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/pages/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
 const router = useRouter();
