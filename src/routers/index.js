@@ -9,8 +9,8 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-import { getChannel } from '@/apis/channel';
 import Login from '@/pages/auth/';
+import { getChannel } from '@/apis/channel';
 import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
@@ -61,10 +61,6 @@ const routes = [
     component: () => import('@/pages/submission/SubmissionUpdate.vue'),
     meta: { layout: 'root', subLayout: 'sublayout' },
   }, // 수정(학생)
-
-  {
-    path: 
-  }
 
   // { path: '/channels/:channelId/assignments/:assignmentId/submissions/new', component: Submission,  meta: { layout: 'root', subLayout: 'sublayout' }, }, 제출(학생)
   {

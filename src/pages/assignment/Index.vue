@@ -14,7 +14,7 @@
       <!-- 교사만 생성 버튼 -->
       <v-btn
         v-if="channel?.roleName === 'TUTOR'"
-        color="primary"
+        color="#ffe8ff"
         elevation="0"
         rounded="xl"
         @click="goToCreate"
