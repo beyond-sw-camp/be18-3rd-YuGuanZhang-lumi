@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * router/index.js
  *
@@ -8,15 +9,15 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-import Login from '@/pages/login';
-import Signup from '@/pages/signup';
+import { getChannel } from '@/apis/channel';
+import Login from '@/pages/auth/';
+import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
   { path: '/', redirect: '/channels' },
   { path: '/login', component: Login, meta: { layout: 'blank' } },
-  { path: '/signup', component: Signup, meta: { layout: 'blank' } },
   { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
-  { path: '/calendar', component: () => import('@/pages/calender'), meta: { layout: 'root' } },
+  { path: '/calendar', component: () => import('@/pages/calendar'), meta: { layout: 'root' } },
   { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
   { path: '/setting', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
   {
@@ -104,6 +105,32 @@ router.onError((err, to) => {
 
 router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload');
+});
+
+router.beforeEach(async to => {
+  const authStore = useAuthStore();
+
+  try {
+    if (authStore.tokenInfo.accessToken === '') {
+      await authStore.refreshAccessToken();
+    }
+
+    if (to.path === '/login' && authStore.tokenInfo.accessToken) {
+      return { path: '/channels' };
+    }
+
+    if (to.name === undefined && to.path.includes('/channels') && to.path.includes('classes')) {
+      const channelId = to.params.channelId;
+      const channel = await getChannel(channelId);
+      if (channel.roleName !== 'TUTOR') {
+        return { path: `/channels/${channelId}/assignments` };
+      }
+    }
+  } catch {
+    if (to.path !== '/login') {
+      return { path: '/login' };
+    }
+  }
 });
 
 export default router;
