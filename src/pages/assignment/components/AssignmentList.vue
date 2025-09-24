@@ -4,7 +4,7 @@
       v-for="a in assignments"
       :key="a.assignmentId"
       :assignment="a"
-      :user-role="userRole"
+      :channel="channel"
       @click="$emit('click', a)"
       @delete="$emit('delete', a)"
       @edit="$emit('edit', a)"
@@ -17,7 +17,7 @@ import AssignmentCard from './AssignmentCard.vue';
 
 defineProps({
   assignments: Array,
-  userRole: String,
+  channel: { type: Object, default: () => ({}) },
 });
 
 defineEmits(['edit', 'delete', 'click']);

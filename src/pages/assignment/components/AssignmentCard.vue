@@ -7,21 +7,18 @@
         <div class="text-caption mt-1">
           생성: {{ assignment.createdAt }} / 수정: {{ assignment.updatedAt }}
         </div>
-        <div class="text-caption mt-1">{{ assignment.content }}</div>
       </div>
 
       <div class="d-flex align-center">
-        <v-chip v-if="assignment.submission" class="mr-2" color="success" size="small">
-          제출 완료
+        <v-chip class="mr-2" :color="assignment.submission ? 'success' : 'warning'" size="small">
+          {{ assignment.submission ? '제출 완료' : '미제출' }}
         </v-chip>
-        <v-chip v-else class="mr-2" color="warning" size="small">미제출</v-chip>
-
-        <v-chip v-if="assignment.evaluation" class="mr-2" color="info" size="small">
-          평가 있음
+        <v-chip class="mr-2" :color="assignment.evaluation ? 'info' : 'grey'" size="small">
+          {{ assignment.evaluation ? '평가 있음' : '평가 없음' }}
         </v-chip>
 
         <!-- 역할별 버튼 -->
-        <template v-if="userRole === 'TEACHER'">
+        <template v-if="channel?.roleName === 'TUTOR'">
           <v-btn
             class="mr-2"
             color="primary"
@@ -34,7 +31,12 @@
             >삭제</v-btn
           >
         </template>
-        <v-btn v-else-if="userRole === 'STUDENT'" color="primary" size="small" variant="flat">
+        <v-btn
+          v-else-if="channel?.roleName === 'STUDENT'"
+          color="primary"
+          size="small"
+          variant="flat"
+        >
           제출
         </v-btn>
       </div>
@@ -45,7 +47,7 @@
 <script setup>
 defineProps({
   assignment: Object,
-  userRole: String,
+  channel: { type: Object, default: () => ({}) },
 });
 defineEmits(['edit', 'delete', 'click']);
 </script>
