@@ -110,10 +110,10 @@
                       </template>
                       <v-list>
                         <v-list-item class="text-button" @click="editCourse(item)">
-                          수정하기
+                          수정
                         </v-list-item>
                         <v-list-item class="text-button" @click="askDelete(item.entityId)">
-                          삭제하기
+                          삭제
                         </v-list-item>
                       </v-list>
                     </v-menu>
@@ -137,11 +137,12 @@
 
     <v-dialog v-model="showDeleteModal" max-width="400">
       <v-card>
-        <v-card-title>정말 삭제하시겠습니까?</v-card-title>
+        <v-card-title>일정 삭제</v-card-title>
+        <v-card-text>일정을 정말 삭제하시겠습니까?</v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="red" text @click="confirmDelete">삭제하기</v-btn>
           <v-btn color="grey" text @click="cancelDelete">취소</v-btn>
+          <v-btn color="red" text @click="confirmDelete">삭제하기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

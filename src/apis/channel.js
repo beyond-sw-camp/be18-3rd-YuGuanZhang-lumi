@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from '@/apis/apiClient';
 
 // 채널 목록 조회
 export async function getChannels(page = 0, size = 20) {

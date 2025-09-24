@@ -14,12 +14,12 @@
       <!-- 교사만 생성 버튼 -->
       <v-btn
         v-if="channel?.roleName === 'TUTOR'"
-        color="#ffe8ff"
+        class="rounded-xl"
+        color="primary-button-1"
         elevation="0"
-        rounded="xl"
         @click="goToCreate"
       >
-        자료 등록
+        자료 생성하기
       </v-btn>
     </div>
 

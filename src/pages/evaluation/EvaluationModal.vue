@@ -35,7 +35,7 @@
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
         <v-card-title>평가 삭제</v-card-title>
-        <v-card-text>정말 평가를 삭제하시겠습니까?</v-card-text>
+        <v-card-text>평가를 정말 삭제하시겠습니까?</v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="deleteDialog = false">취소</v-btn>

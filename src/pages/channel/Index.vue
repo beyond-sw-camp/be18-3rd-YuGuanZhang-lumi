@@ -2,8 +2,12 @@
   <div>
     <!-- 상단 등록하기 버튼 -->
     <div class="d-flex justify-end mb-4 pa-4 ga-2">
-      <v-btn color="#ffe8ff" elevation="0" @click="openJoinModal">채널 참가하기</v-btn>
-      <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal"> 채널 등록하기 </v-btn>
+      <v-btn class="rounded-xl" color="primary-button-1" elevation="0" @click="openJoinModal"
+        >채널 참가하기</v-btn
+      >
+      <v-btn class="rounded-xl" color="primary-button-1" elevation="0" @click="openCreateModal">
+        채널 생성하기
+      </v-btn>
     </div>
 
     <!-- 채널 카드 목록 -->
@@ -43,10 +47,10 @@ import { useRouter } from 'vue-router';
 import {
   createChannel,
   deleteChannel,
-  getChannels,
-  updateChannel,
-  joinChannel,
   getChannel,
+  getChannels,
+  joinChannel,
+  updateChannel,
 } from '@/apis/channel';
 
 import ChannelCard from './components/ChannelCard.vue';

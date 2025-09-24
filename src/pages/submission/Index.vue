@@ -79,7 +79,7 @@
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
         <v-card-title>제출 삭제</v-card-title>
-        <v-card-text> "{{ submission?.title }}" 제출을 삭제하시겠습니까? </v-card-text>
+        <v-card-text> "{{ submission?.title }}" 제출을 정말 삭제하시겠습니까? </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="deleteDialog = false">취소</v-btn>
