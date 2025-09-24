@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center">
     <v-card class="pa-6 rounded-xl shadow-lg" max-width="600" width="100%">
-      <v-card-title class="text-h5 font-weight-bold">과제 수정</v-card-title>
+      <v-card-title class="text-h5 font-weight-bold">자료 수정</v-card-title>
       <v-divider class="mb-4" />
 
       <v-form @submit.prevent="handleUpdate">
@@ -10,7 +10,7 @@
           v-model="form.title"
           class="mb-4"
           density="comfortable"
-          label="과제 제목"
+          label="자료 제목"
           required
           variant="outlined"
         />
@@ -19,32 +19,10 @@
         <v-textarea
           v-model="form.content"
           class="mb-4"
-          label="과제 설명"
+          label="자료 설명"
           rows="4"
           variant="outlined"
         />
-
-        <!-- 마감일 -->
-        <v-row>
-          <v-col cols="12" md="6" sm="12">
-            <v-text-field
-              v-model="form.deadlineAt"
-              class="mb-4"
-              density="comfortable"
-              label="제출 마감일"
-              required
-              type="datetime-local"
-              variant="outlined"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- 스위치 -->
-        <v-row>
-          <v-col cols="12" md="6" sm="12">
-            <v-switch v-model="form.evaluation" color="primary" inset label="평가 필요 여부" />
-          </v-col>
-        </v-row>
 
         <!-- 기존 파일 목록 -->
         <div v-if="existingFiles.length > 0" class="mb-4">
@@ -110,19 +88,18 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getAssignment, updateAssignment } from '@/apis/assignment';
-import { deleteFile, uploadFiles } from '@/apis/file';
+import { uploadFiles } from '@/apis/file';
+import { getMaterial, updateMaterial } from '@/apis/material';
+
 const route = useRoute();
 const router = useRouter();
 
 const channelId = route.params.channelId;
-const assignmentId = route.params.assignmentId;
+const materialId = route.params.materialId;
 
 const form = ref({
   title: '',
   content: '',
-  deadlineAt: '',
-  evaluation: false,
 });
 
 // 기존 파일 (API에서 불러올 예정)
@@ -131,53 +108,42 @@ const existingFiles = ref([]);
 const newFiles = ref([]);
 
 // 기존 데이터 불러오기
-async function loadAssignment() {
-  const data = await getAssignment(channelId, assignmentId);
+async function loadMaterial() {
+  const data = await getMaterial(channelId, materialId);
 
   form.value = {
     title: data.title,
     content: data.content,
-    // API는 "yyyy-MM-dd HH:mm:ss" → input은 "yyyy-MM-ddTHH:mm"
-    deadlineAt: data.deadlineAt.replace(' ', 'T').slice(0, 16),
-    evaluation: data.evaluation,
   };
 
-  existingFiles.value = data.files || [];
+  existingFiles.value = data.files || []; // 파일 목록 세팅
 }
 
-console.log('확인', form.value);
-
-onMounted(() => loadAssignment());
-
-console.log('확인2', form.value);
+onMounted(() => loadMaterial());
 
 async function handleUpdate() {
   let newFileIds = [];
   if (newFiles.value.length > 0) {
-    const uploaded = await uploadFiles('ASSIGNMENT', newFiles.value);
+    const uploaded = await uploadFiles('MATERIAL', newFiles.value);
     newFileIds = uploaded.map(f => f.fileId);
   }
-  console.log('수정할 데이터:', form.value);
-  console.log('삭제된 파일:', existingFiles.value); // TODO: 실제 삭제 목록 처리
-  console.log('추가된 파일:', newFiles.value); // TODO: FormData로 전송
 
+  // 기존 파일 중 삭제되지 않은 것만 남기기
   const keptFileIds = existingFiles.value.map(f => f.fileId);
 
   const payload = {
     title: form.value.title,
     content: form.value.content,
-    deadlineAt: form.value.deadlineAt.replace('T', ' ') + ':00',
-    isEvaluation: form.value.evaluation,
     fileIds: [...keptFileIds, ...newFileIds],
   };
 
-  await updateAssignment(channelId, assignmentId, payload);
+  await updateMaterial(channelId, materialId, payload);
 
-  router.push(`/channels/${channelId}/assignments`);
+  router.push(`/channels/${channelId}/materials`);
 }
 
 function goBack() {
-  router.push(`/channels/${channelId}/assignments`);
+  router.push(`/channels/${channelId}/materials`);
 }
 
 function removeExistingFile(index) {
@@ -188,6 +154,7 @@ function removeNewFile(index) {
   newFiles.value.splice(index, 1);
 }
 </script>
+
 <style scoped>
 .file-list {
   padding-left: 16px;
