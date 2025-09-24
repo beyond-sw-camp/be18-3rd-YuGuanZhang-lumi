@@ -163,6 +163,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 참여자 목록
+  const fetchParticipants = async channelId => {
+    if (!tokenInfo.accessToken) throw new Error('로그인 필요');
+
+    try {
+      const response = await apiClient.get(`/channels/${channelId}/participants`, {
+        headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
+      });
+
+      // 🔹 데이터에 name과 email 추가 (백엔드에서 DTO에 포함했다고 가정)
+      return response.data?.data || [];
+    } catch (err) {
+      console.error('참여자 목록 불러오기 실패:', err);
+      return [];
+    }
+  };
+
   return {
     tokenInfo,
     setAccessToken,
@@ -175,5 +192,6 @@ export const useAuthStore = defineStore('auth', () => {
     fetchProfile,
     deleted,
     sendInvitation,
+    fetchParticipants,
   };
 });

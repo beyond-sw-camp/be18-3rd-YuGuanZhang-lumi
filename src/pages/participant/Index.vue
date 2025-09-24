@@ -69,7 +69,6 @@
 
 <script>
 import { useAuthStore } from '../stores/authStore';
-import apiClient from '@/apis/apiClient';
 
 export default {
   name: 'InviteDialog',
@@ -85,7 +84,7 @@ export default {
       dialog: false,
       selectedRoleId: null,
       invitationCode: null,
-      participants: [], // 참여자 목록
+      participants: [],
       roles: [
         { id: 2, name: '학생' },
         { id: 3, name: '학부모' },
@@ -93,27 +92,22 @@ export default {
     };
   },
   async mounted() {
-    await this.fetchParticipants(); // 페이지 들어올 때 목록 불러오기
-  },
-  mounted() {
-    this.fetchParticipants();
+    await this.loadParticipants();
   },
   methods: {
     async openDialog() {
       this.dialog = true;
     },
-
-    async fetchParticipants() {
+    async loadParticipants() {
       try {
+        const authStore = useAuthStore();
         const channelId = this.$route.params.channelId;
-        const res = await apiClient.get(`/channels/${channelId}/participants`);
-        this.participants = res.data?.data || [];
+        this.participants = await authStore.fetchParticipants(channelId);
         console.log('참여자 목록:', this.participants);
       } catch (err) {
-        console.error('참여자 목록 불러오기 실패:', err);
+        console.error(err);
       }
     },
-
     async sendInvitation() {
       try {
         const authStore = useAuthStore();
@@ -127,7 +121,7 @@ export default {
         }
 
         this.selectedRoleId = null;
-        await this.fetchParticipants(); // 갱신
+        await this.loadParticipants(); // 초대 후 참여자 목록 갱신
       } catch (err) {
         console.error(err);
       }
@@ -136,29 +130,6 @@ export default {
       this.dialog = false;
       this.invitationCode = null;
     },
-  },
-
-  async sendInvitation() {
-    try {
-      const authStore = useAuthStore();
-      const channelId = this.$route.params.channelId;
-
-      const result = await authStore.sendInvitation(channelId, this.selectedRoleId);
-      console.log('초대 발송 성공', result);
-
-      if (result?.data?.[0]?.invitationCode) {
-        this.invitationCode = result.data[0].invitationCode;
-      }
-
-      this.selectedRoleId = null;
-      await this.fetchParticipants(); // 초대 후 참여자 목록 갱신
-    } catch (err) {
-      console.error(err);
-    }
-  },
-  closeDialog() {
-    this.dialog = false;
-    this.invitationCode = null;
   },
 };
 </script>
