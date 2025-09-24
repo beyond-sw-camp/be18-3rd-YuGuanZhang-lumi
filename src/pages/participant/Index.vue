@@ -19,7 +19,8 @@
               cols="auto"
               v-if="user.userId === authStore.tokenInfo.userId && user.roleName !== 'TUTOR'"
             >
-              <v-btn small color="red" @click="handleAction(user)">삭제</v-btn>
+              <v-btn small color="#eeddff" @click="openUserInfo(user)">정보</v-btn>
+              <v-btn small color="#eeddff" @click="handleAction(user)">탈퇴</v-btn>
             </v-col>
           </v-row>
         </v-list-item>
@@ -78,14 +79,24 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- 🔹 참여자 정보 모달 (조회 전용) -->
+    <ChannelUserInfoModal
+      :visible="userInfoDialog"
+      :userId="selectedUserId"
+      :channelId="channel?.id || $route.params.channelId"
+      @close="userInfoDialog = false"
+    />
   </div>
 </template>
 
 <script>
 import { useAuthStore } from '../stores/authStore';
+import ChannelUserInfoModal from '../channel/components/ChannelUserInfoModal.vue';
 
 export default {
   name: 'InviteDialog',
+  components: { ChannelUserInfoModal },
   props: {
     channel: {
       type: Object,
@@ -107,6 +118,9 @@ export default {
         { id: 2, name: '학생' },
         { id: 3, name: '학부모' },
       ],
+      // InfoDialog 제어용 상태
+      userInfoDialog: false,
+      selectedUserId: null,
     };
   },
   async mounted() {
@@ -120,7 +134,6 @@ export default {
       try {
         const channelId = this.$route.params.channelId;
         this.participants = await this.authStore.fetchParticipants(channelId);
-        console.log('참여자 목록:', this.participants);
       } catch (err) {
         console.error(err);
       }
@@ -129,14 +142,13 @@ export default {
       try {
         const channelId = this.$route.params.channelId;
         const result = await this.authStore.sendInvitation(channelId, this.selectedRoleId);
-        console.log('초대 발송 성공', result);
 
         if (result?.data?.[0]?.invitationCode) {
           this.invitationCode = result.data[0].invitationCode;
         }
 
         this.selectedRoleId = null;
-        await this.loadParticipants(); // 초대 후 참여자 목록 갱신
+        await this.loadParticipants();
       } catch (err) {
         console.error(err);
       }
@@ -147,20 +159,20 @@ export default {
     },
     async handleAction(user) {
       try {
-        // 자기 자신만 삭제 가능
-        // @ts-ignore
         if (user.userId !== this.authStore.tokenInfo.userId) return;
 
         const channelId = this.$route.params.channelId;
         const response = await this.authStore.deleteSelfFromChannel(channelId);
-
         console.log('참여자 삭제 성공:', response);
 
-        // 삭제 후 참여자 목록 갱신
         await this.loadParticipants();
       } catch (err) {
         console.error('참여자 삭제 실패:', err);
       }
+    },
+    openUserInfo(user) {
+      this.selectedUserId = Array.isArray(user.userId) ? user.userId[0] : user.userId;
+      this.userInfoDialog = true;
     },
   },
 };

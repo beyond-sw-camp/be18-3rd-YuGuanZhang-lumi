@@ -200,6 +200,20 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 참여자 상세 조회
+  const fetchChannelUser = async (channelId, userId) => {
+    if (!tokenInfo.accessToken) throw new Error('로그인 필요');
+    try {
+      const response = await apiClient.get(`/channels/${channelId}/participants/${userId}`, {
+        headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
+      });
+      return response.data;
+    } catch (err) {
+      console.error('참여자 상세 조회 실패:', err);
+      throw err;
+    }
+  };
+
   return {
     tokenInfo,
     setAccessToken,
@@ -214,5 +228,6 @@ export const useAuthStore = defineStore('auth', () => {
     sendInvitation,
     fetchParticipants,
     deleteSelfFromChannel,
+    fetchChannelUser,
   };
 });
