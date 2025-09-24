@@ -15,13 +15,13 @@
     <canvas ref="chartCanvas"></canvas>
 
     <!-- 등록 버튼 -->
-    <div class="d-flex justify-end mt-4">
-      <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal"> 성적 등록하기 </v-btn>
+    <div v-if="channel?.roleName === 'TUTOR'" class="d-flex justify-end mt-4">
+      <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal">성적 등록하기</v-btn>
     </div>
 
     <!-- 데이터 테이블 -->
     <template v-if="flatData.length > 0">
-      <div class="table-wrapper">
+      <div class="table-wrapper" style="min-height: 200px; max-height: 100%">
         <v-table class="text-center">
           <thead>
             <tr>
@@ -47,7 +47,7 @@
                   {{ row.category }}
                 </v-chip>
               </td>
-              <td class="text-right">
+              <td v-if="channel?.roleName === 'TUTOR'" class="text-right">
                 <v-menu>
                   <template #activator="{ props }">
                     <v-btn v-bind="props" icon size="small" variant="text">
@@ -67,14 +67,14 @@
     </template>
 
     <template v-else>
-      <v-list-item>
+      <v-list-item style="min-height: 200px; max-height: 100%">
         <v-list-item class="text-center text-grey">
           <v-list-item-title>등록된 성적이 없습니다.</v-list-item-title>
         </v-list-item>
       </v-list-item>
     </template>
 
-    <v-dialog v-model="formDialog" max-width="400">
+    <v-dialog v-model="formDialog" max-width="400px">
       <v-card>
         <v-card-title>{{ editingId ? '성적 수정' : '성적 등록' }}</v-card-title>
         <v-card-text>
@@ -130,7 +130,7 @@
     </v-dialog>
 
     <!-- 삭제 모달 -->
-    <v-dialog v-model="deleteDialog" max-width="300">
+    <v-dialog v-model="deleteDialog" max-width="300px">
       <v-card>
         <v-card-title>정말 삭제하시겠습니까?</v-card-title>
         <v-card-actions>
@@ -144,17 +144,20 @@
 </template>
 
 <script setup>
-import { Chart } from 'chart.js/auto';
+import Chart from 'chart.js/auto';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { getChannel } from '@/apis/channel';
 import { createGrade, deleteGrade, getGrades, updateGrade } from '@/apis/score';
 import { useApi } from '@/composable/useApi';
 import { CATEGORY_COLORS } from '@/constants/categoryColors';
 
 const { data: grades, queryFnExecute: useGetGrades } = useApi(getGrades);
+const { data: channel, queryFnExecute: useGetChannel } = useApi(getChannel);
 const { queryFnExecute: useCreateGrade } = useApi(createGrade);
 const { queryFnExecute: useUpdateGrade } = useApi(updateGrade);
 const { queryFnExecute: useDeleteGrade } = useApi(deleteGrade);
+
 const channelId = Number(useRoute().params.channelId);
 
 const selectedCategory = ref('전체');
@@ -298,6 +301,7 @@ async function confirmDelete() {
 
 onMounted(async () => {
   await useGetGrades(channelId);
+  await useGetChannel(channelId);
   renderChart(selectedCategory.value);
 });
 
