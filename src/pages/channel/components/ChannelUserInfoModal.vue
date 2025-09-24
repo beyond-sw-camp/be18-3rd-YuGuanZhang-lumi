@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { useAuthStore } from '@/pages/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export default {
   name: 'InfoDialog',

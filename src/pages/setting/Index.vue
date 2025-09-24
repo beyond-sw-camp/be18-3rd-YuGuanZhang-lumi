@@ -12,7 +12,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -21,7 +21,7 @@ async function deleted() {
   try {
     await authStore.deleted({ email: authStore.tokenInfo.email });
     alert('회원탈퇴 되었습니다.');
-    router.push('/channel');
+    router.push('/login');
   } catch (error) {
     console.error(error);
     alert('회원탈퇴 실패했습니다.');

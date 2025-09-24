@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 상단 등록하기 버튼 -->
-    <div class="d-flex justify-end mb-4">
+    <div class="d-flex justify-end mb-4 pa-4 ga-2">
       <v-btn color="#ffe8ff" elevation="0" @click="openJoinModal">채널 참가하기</v-btn>
       <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal"> 채널 등록하기 </v-btn>
     </div>
@@ -77,9 +77,10 @@ const joinDialog = ref(false);
 // ✅ 채널 목록 불러오기
 async function loadChannels() {
   channels.value = await getChannels();
+  console.log('ch', channels.value);
 }
 
-onMounted(() => loadChannels());
+onMounted(async () => await loadChannels());
 
 function openCreateModal() {
   formMode.value = 'create';

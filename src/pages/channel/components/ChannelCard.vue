@@ -1,5 +1,6 @@
 <template>
-  <v-card v-if="channel" class="channel-card pa-4" rounded-2xl>
+  <v-card class="channel-card pa-4" rounded-2xl>
+    <!-- 카드 헤더 (채널명 + 캐밥 버튼) -->
     <div class="d-flex justify-space-between align-center mb-2">
       <h3>{{ channel.name }}</h3>
       <v-menu v-if="channel?.roleName === 'TUTOR'">
@@ -15,6 +16,7 @@
       </v-menu>
     </div>
 
+    <!-- 카드 내용 (과목명) -->
     <p class="text-subtitle-1">과목: {{ channel.subject }}</p>
   </v-card>
 </template>
@@ -26,6 +28,8 @@ defineProps({
     required: true,
   },
 });
+
+// console.log('channel', channel);
 
 // 이벤트: edit, delete를 부모에게 전달
 defineEmits(['edit', 'delete']);

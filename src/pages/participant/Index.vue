@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { useAuthStore } from '../stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import ChannelUserInfoModal from '../channel/components/ChannelUserInfoModal.vue';
 
 export default {
