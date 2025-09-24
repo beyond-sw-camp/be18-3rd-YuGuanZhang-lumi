@@ -1,13 +1,27 @@
 <template>
   <div>
-    <!-- 🔹 참여자 목록 (모달 밖) -->
+    <!-- 🔹 참여자 목록 -->
     <v-card class="mb-4">
       <v-card-title>참여자 목록</v-card-title>
       <v-list dense>
         <v-list-item v-for="user in participants" :key="user.userId">
-          <v-list-item-title>
-            {{ user.name || user.userId }} / {{ user.email || user.userId }} / ({{ user.roleName }})
-          </v-list-item-title>
+          <v-row class="w-100" align="center">
+            <!-- 텍스트 영역 -->
+            <v-col>
+              {{ user.name || user.userId }} / {{ user.email || user.userId }} / ({{
+                user.roleName
+              }})
+            </v-col>
+
+            <!-- 버튼 영역: 로그인한 사용자만 -->
+            <v-col
+              class="d-flex justify-end"
+              cols="auto"
+              v-if="user.userId === authStore.tokenInfo.userId && user.roleName !== 'TUTOR'"
+            >
+              <v-btn small color="red" @click="handleAction(user)">삭제</v-btn>
+            </v-col>
+          </v-row>
         </v-list-item>
 
         <v-list-item v-if="participants.length === 0">
@@ -17,7 +31,7 @@
     </v-card>
 
     <!-- 🔹 초대발송 버튼 & 모달 -->
-    <v-btn color="primary" @click="openDialog">초대발송</v-btn>
+    <v-btn color="#eeddff" @click="openDialog">초대발송</v-btn>
 
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
@@ -69,6 +83,7 @@
 
 <script>
 import { useAuthStore } from '../stores/authStore';
+import apiClient from '@/apis/apiClient';
 
 export default {
   name: 'InviteDialog',
@@ -78,6 +93,10 @@ export default {
       required: false,
       default: () => ({ name: '', subject: '' }),
     },
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
   },
   data() {
     return {
@@ -100,9 +119,8 @@ export default {
     },
     async loadParticipants() {
       try {
-        const authStore = useAuthStore();
         const channelId = this.$route.params.channelId;
-        this.participants = await authStore.fetchParticipants(channelId);
+        this.participants = await this.authStore.fetchParticipants(channelId);
         console.log('참여자 목록:', this.participants);
       } catch (err) {
         console.error(err);
@@ -110,10 +128,8 @@ export default {
     },
     async sendInvitation() {
       try {
-        const authStore = useAuthStore();
         const channelId = this.$route.params.channelId;
-
-        const result = await authStore.sendInvitation(channelId, this.selectedRoleId);
+        const result = await this.authStore.sendInvitation(channelId, this.selectedRoleId);
         console.log('초대 발송 성공', result);
 
         if (result?.data?.[0]?.invitationCode) {
@@ -129,6 +145,23 @@ export default {
     closeDialog() {
       this.dialog = false;
       this.invitationCode = null;
+    },
+    async handleAction(user) {
+      try {
+        // 자기 자신만 삭제 가능
+        // @ts-ignore
+        if (user.userId !== this.authStore.tokenInfo.userId) return;
+
+        const channelId = this.$route.params.channelId;
+        const response = await this.authStore.deleteSelfFromChannel(channelId);
+
+        console.log('참여자 삭제 성공:', response);
+
+        // 삭제 후 참여자 목록 갱신
+        await this.loadParticipants();
+      } catch (err) {
+        console.error('참여자 삭제 실패:', err);
+      }
     },
   },
 };

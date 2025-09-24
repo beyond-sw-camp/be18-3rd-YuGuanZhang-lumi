@@ -136,6 +136,8 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await apiClient.get('/user/profile');
       const profile = response.data.data[0];
 
+      // @ts-ignore
+      tokenInfo.userId = profile.userId;
       tokenInfo.name = profile.name;
       tokenInfo.email = profile.email;
 
@@ -180,6 +182,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 참여자 삭제
+  const deleteSelfFromChannel = async channelId => {
+    if (!tokenInfo.accessToken) throw new Error('로그인 필요');
+
+    try {
+      const response = await apiClient.delete(`/channels/${channelId}/participants/me`, {
+        headers: {
+          Authorization: `Bearer ${tokenInfo.accessToken}`,
+        },
+      });
+
+      return response.data;
+    } catch (err) {
+      console.error('참여자 삭제 실패:', err);
+      throw err;
+    }
+  };
+
   return {
     tokenInfo,
     setAccessToken,
@@ -193,5 +213,6 @@ export const useAuthStore = defineStore('auth', () => {
     deleted,
     sendInvitation,
     fetchParticipants,
+    deleteSelfFromChannel,
   };
 });
