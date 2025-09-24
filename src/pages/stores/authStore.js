@@ -1,74 +1,86 @@
 // stores/authStore.js
+import apiClient from '@/apis/apiClient';
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
-import apiClient from '@/apis/apiClient';
 
 export const useAuthStore = defineStore('auth', () => {
+  // --- 상태 초기화 ---
   const tokenInfo = reactive({
-    accessToken: '',
-    refreshToken: '',
+    accessToken: null,
+    refreshToken: localStorage.getItem('refreshToken') || null,
     name: '',
     email: '',
   });
 
-  // 새로고침 시 localStorage에서 토큰 불러오기
-  const savedAccessToken = localStorage.getItem('accessToken');
-  const savedRefreshToken = localStorage.getItem('refreshToken');
-  if (savedAccessToken) {
-    tokenInfo.accessToken = savedAccessToken;
-    apiClient.defaults.headers['Authorization'] = `Bearer ${savedAccessToken}`;
-  }
-  if (savedRefreshToken) {
-    tokenInfo.refreshToken = savedRefreshToken;
+  // --- accessToken 설정 ---
+  const setAccessToken = token => {
+    tokenInfo.accessToken = token;
+    apiClient.defaults.headers['Authorization'] = `Bearer ${token}`;
+  };
+
+  // --- 로그아웃 공통 처리 ---
+  const performLogout = () => {
+    tokenInfo.accessToken = null;
+    tokenInfo.refreshToken = null;
+    tokenInfo.name = '';
+    tokenInfo.email = '';
+    localStorage.removeItem('refreshToken');
+    delete apiClient.defaults.headers['Authorization'];
+  };
+
+  // --- accessToken 재발급 ---
+  const refreshAccessToken = async () => {
+    if (!tokenInfo.refreshToken) throw new Error('No refresh token');
+
+    try {
+      const response = await apiClient.post(
+        '/refresh',
+        { refreshToken: tokenInfo.refreshToken },
+        { _skipInterceptor: true },
+      );
+
+      if (response.status === 200) {
+        setAccessToken(response.data.accessToken);
+        tokenInfo.refreshToken = response.data.refreshToken;
+        localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+      }
+    } catch (error) {
+      console.error('Refresh token failed', error);
+      performLogout();
+      throw error;
+    }
+  };
+
+  // --- 초기화 시 자동 로그인 시도 ---
+  if (tokenInfo.refreshToken) {
+    refreshAccessToken().catch(() => {
+      console.log('자동 로그인 실패, 로그아웃 처리됨');
+    });
   }
 
-  // 로그인 처리
+  // --- 로그인 처리 ---
   const login = async formData => {
     try {
-      // @ts-ignore
       const response = await apiClient.post('/login', formData, { _skipInterceptor: true });
 
       if (response.status === 200 && response.data.data?.length) {
-        Object.assign(tokenInfo, response.data.data[0]);
+        const data = response.data.data[0];
+        setAccessToken(data.accessToken);
 
-        localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+        tokenInfo.refreshToken = data.refreshToken;
+        localStorage.setItem('refreshToken', data.refreshToken);
 
-        // apiClient 기본 헤더에 토큰 세팅
-        apiClient.defaults.headers['Authorization'] = `Bearer ${tokenInfo.accessToken}`;
         return response.data;
       }
 
       throw new Error(response.data.message);
     } catch (error) {
-      const backendMessage = error.response?.data?.message;
-      console.error('[Login Error]', backendMessage);
-      throw new Error(backendMessage || error.message);
+      console.error('[Login Error]', error.response?.data?.message || error.message);
+      throw error;
     }
   };
 
-  // accessToken 재발급
-  const refreshAccessToken = async () => {
-    if (!tokenInfo.refreshToken) throw new Error('No refresh token');
-
-    const response = await apiClient.post(
-      '/refresh',
-      { refreshToken: tokenInfo.refreshToken },
-      // @ts-ignore
-      { _skipInterceptor: true },
-    );
-
-    if (response.status === 200) {
-      tokenInfo.accessToken = response.data.accessToken;
-      tokenInfo.refreshToken = response.data.refreshToken;
-
-      localStorage.setItem('accessToken', tokenInfo.accessToken);
-      localStorage.setItem('refreshToken', tokenInfo.refreshToken);
-
-      apiClient.defaults.headers['Authorization'] = `Bearer ${tokenInfo.accessToken}`;
-    }
-  };
-
-  // 로그아웃 처리
+  // --- 로그아웃 처리 ---
   const logout = async () => {
     if (!tokenInfo.refreshToken) return;
 
@@ -76,7 +88,6 @@ export const useAuthStore = defineStore('auth', () => {
       await apiClient.post(
         '/logout',
         { refreshToken: tokenInfo.refreshToken },
-        // @ts-ignore
         { _skipInterceptor: true },
       );
     } catch (error) {
@@ -86,20 +97,7 @@ export const useAuthStore = defineStore('auth', () => {
     performLogout();
   };
 
-  // 공통 로그아웃
-  const performLogout = () => {
-    tokenInfo.accessToken = '';
-    tokenInfo.refreshToken = '';
-    tokenInfo.name = '';
-    tokenInfo.email = '';
-
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-
-    apiClient.defaults.headers['Authorization'] = '';
-  };
-
-  // 회원가입
+  // --- 회원가입 ---
   const signUp = async formData => {
     const payload = {
       name: formData.name,
@@ -111,30 +109,28 @@ export const useAuthStore = defineStore('auth', () => {
     return response.data;
   };
 
-  // 이메일
+  // --- 이메일 발송 ---
   const sendEmail = async email => {
     if (!email) throw new Error('이메일을 입력해주세요.');
-    const response = await apiClient.post('/email/send', { email });
-    return response;
+    return await apiClient.post('/email/send', { email });
   };
 
-  // 회원탈퇴
+  // --- 회원탈퇴 ---
   const deleted = async formData => {
-    const payload = { email: formData.email };
-
-    const response = await apiClient.patch('/user/me', payload, {
-      headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
-    });
+    const response = await apiClient.patch(
+      '/user/me',
+      { email: formData.email },
+      { headers: { Authorization: `Bearer ${tokenInfo.accessToken}` } },
+    );
 
     if (response.status === 200) {
       performLogout();
-      localStorage.removeItem('refreshToken');
     }
 
     return response.data;
   };
 
-  // 사용자 프로필 불러오기
+  // --- 사용자 프로필 불러오기 ---
   const fetchProfile = async () => {
     try {
       const response = await apiClient.get('/user/profile');
@@ -150,8 +146,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 채널 초대
+  const sendInvitation = async (channelId, roleId) => {
+    if (!tokenInfo.accessToken) throw new Error('로그인 필요');
+
+    try {
+      const payload = { roleId };
+      const response = await apiClient.post(`/channels/${channelId}/invitations`, payload, {
+        headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
+      });
+
+      return response.data;
+    } catch (err) {
+      console.error('초대 발송 실패', err);
+      throw err;
+    }
+  };
+
   return {
     tokenInfo,
+    setAccessToken,
     login,
     refreshAccessToken,
     logout,
@@ -160,5 +174,6 @@ export const useAuthStore = defineStore('auth', () => {
     signUp,
     fetchProfile,
     deleted,
+    sendInvitation,
   };
 });

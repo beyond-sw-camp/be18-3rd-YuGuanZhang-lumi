@@ -1,6 +1,5 @@
 <template>
-  <v-card class="channel-card pa-4" rounded-2xl>
-    <!-- 카드 헤더 (채널명 + 캐밥 버튼) -->
+  <v-card v-if="channel" class="channel-card pa-4" rounded-2xl>
     <div class="d-flex justify-space-between align-center mb-2">
       <h3>{{ channel.name }}</h3>
       <v-menu>
@@ -12,16 +11,21 @@
         <v-list elevation="0">
           <v-list-item @click="$emit('edit', channel)">수정</v-list-item>
           <v-list-item @click="$emit('delete', channel)">삭제</v-list-item>
+          <!-- 초대발송 모달 버튼 추가 -->
+          <v-list-item>
+            <Index :channel="channel" />
+          </v-list-item>
         </v-list>
       </v-menu>
     </div>
 
-    <!-- 카드 내용 (과목명) -->
     <p class="text-subtitle-1">과목: {{ channel.subject }}</p>
   </v-card>
 </template>
 
 <script setup>
+import Index from '@/pages/participant/Index.vue';
+
 defineProps({
   channel: {
     type: Object,

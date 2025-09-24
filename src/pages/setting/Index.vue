@@ -30,6 +30,7 @@ async function deleted() {
 
 async function userInfo() {
   try {
+    // @ts-ignore
     await authStore.fetchUserInfo();
   } catch (error) {
     console.error(error);
