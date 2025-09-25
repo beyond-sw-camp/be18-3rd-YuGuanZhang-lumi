@@ -16,7 +16,7 @@
       </div>
 
       <!-- 참여자 리스트 -->
-      <v-table class="mt-4" density="compact">
+      <v-table class="mt-4">
         <thead>
           <tr>
             <th class="text-left">이름</th>
@@ -83,14 +83,14 @@
         </div>
 
         <v-card-actions class="justify-end">
-          <v-btn text @click="closeDialog">닫기</v-btn>
+          <v-btn text @click="closeDialog">취소</v-btn>
           <v-btn
             v-if="!invitationCode"
             color="primary"
             :disabled="!selectedRoleId"
             @click="sendInvitation"
           >
-            발송
+            발송하기
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -108,8 +108,8 @@
 
 <script>
 import { getChannel } from '@/apis/channel';
+import ChannelUserInfoModal from '@/pages/channel/components/ChannelUserInfoModal.vue';
 import { useAuthStore } from '@/stores/authStore';
-import ChannelUserInfoModal from '../channel/components/ChannelUserInfoModal.vue';
 
 export default {
   name: 'InviteDialog',
@@ -191,9 +191,8 @@ export default {
 
         const channelId = this.$route.params.channelId;
         const response = await this.authStore.deleteSelfFromChannel(channelId);
-        console.log('참여자 삭제 성공:', response);
 
-        await this.loadParticipants();
+        this.$router.replace('/channels');
       } catch (error) {
         console.error('참여자 삭제 실패:', error);
       }

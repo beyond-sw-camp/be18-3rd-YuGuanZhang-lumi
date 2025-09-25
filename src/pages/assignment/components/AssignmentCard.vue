@@ -32,7 +32,7 @@
           >
         </template>
         <v-btn
-          v-else-if="channel?.roleName === 'STUDENT'"
+          v-else-if="channel?.roleName === 'STUDENT' && !assignment.submission"
           color="primary"
           size="small"
           variant="flat"

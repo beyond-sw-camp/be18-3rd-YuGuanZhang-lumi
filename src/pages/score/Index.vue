@@ -55,8 +55,8 @@
                     </v-btn>
                   </template>
                   <v-list>
-                    <v-list-item class="text-button" @click="openEdit(row)">수정하기</v-list-item>
-                    <v-list-item class="text-button" @click="openDelete(row)">삭제하기</v-list-item>
+                    <v-list-item class="text-button" @click="openEdit(row)">수정</v-list-item>
+                    <v-list-item class="text-button" @click="openDelete(row)">삭제</v-list-item>
                   </v-list>
                 </v-menu>
               </td>

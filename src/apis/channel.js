@@ -8,6 +8,11 @@ export async function getChannels(page = 0, size = 20) {
   return data.data; // ✅ 백엔드에서 data 배열 반환
 }
 
+export async function getChannel(channelId) {
+  const { data } = await apiClient.get(`/channels/${channelId}`);
+  return data.data[0];
+}
+
 // 채널 생성
 export async function createChannel(payload) {
   const { data } = await apiClient.post('/channels', payload);
@@ -37,9 +42,4 @@ export async function joinChannel(code) {
     console.error('채널 참가 실패:', error);
     throw error;
   }
-}
-
-export async function getChannel(channelId) {
-  const { data } = await apiClient.get(`/channels/${channelId}`);
-  return data.data[0];
 }

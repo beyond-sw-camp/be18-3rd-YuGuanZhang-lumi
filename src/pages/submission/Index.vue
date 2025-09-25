@@ -83,7 +83,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="deleteDialog = false">취소</v-btn>
-          <v-btn color="red" @click="handleDelete">삭제</v-btn>
+          <v-btn color="red" @click="handleDelete">삭제하기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

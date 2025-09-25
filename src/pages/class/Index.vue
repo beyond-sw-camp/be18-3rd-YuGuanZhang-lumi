@@ -13,7 +13,7 @@
       <v-col cols="4">
         <v-card class="pa-4 d-flex flex-column" style="max-height: 600px; min-height: 600px">
           <v-card-title class="text-subtitle-1 pa-0 ma-0">
-            {{ editingId ? '일정 수정하기' : '일정 등록하기' }}
+            {{ editingId ? '일정 수정' : '일정 등록' }}
           </v-card-title>
           <v-form ref="formRef" v-model="isValid">
             <v-list density="compact">
