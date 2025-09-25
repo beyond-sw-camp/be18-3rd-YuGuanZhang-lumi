@@ -1,5 +1,5 @@
 <template>
-  <v-list class="material-list">
+  <v-list v-if="materials.length > 0" class="material-list">
     <MaterialCard
       v-for="m in materials"
       :key="m.materialId"
@@ -10,6 +10,8 @@
       @edit="$emit('edit', m)"
     />
   </v-list>
+
+  <div v-else class="text-grey text-center pa-4">등록된 수업 자료가 없습니다.</div>
 </template>
 
 <script setup>

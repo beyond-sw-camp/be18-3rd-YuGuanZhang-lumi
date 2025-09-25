@@ -1,7 +1,7 @@
-// stores/authStore.js
-import apiClient from '@/apis/apiClient';
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
+// stores/authStore.js
+import apiClient from '@/apis/apiClient';
 
 export const useAuthStore = defineStore('auth', () => {
   // --- 상태 초기화 ---
@@ -159,9 +159,9 @@ export const useAuthStore = defineStore('auth', () => {
       });
 
       return response.data;
-    } catch (err) {
-      console.error('초대 발송 실패', err);
-      throw err;
+    } catch (error) {
+      console.error('초대 발송 실패', error);
+      throw error;
     }
   };
 
@@ -176,8 +176,8 @@ export const useAuthStore = defineStore('auth', () => {
 
       // 🔹 데이터에 name과 email 추가 (백엔드에서 DTO에 포함했다고 가정)
       return response.data?.data || [];
-    } catch (err) {
-      console.error('참여자 목록 불러오기 실패:', err);
+    } catch (error) {
+      console.error('참여자 목록 불러오기 실패:', error);
       return [];
     }
   };
@@ -194,9 +194,9 @@ export const useAuthStore = defineStore('auth', () => {
       });
 
       return response.data;
-    } catch (err) {
-      console.error('참여자 삭제 실패:', err);
-      throw err;
+    } catch (error) {
+      console.error('참여자 삭제 실패:', error);
+      throw error;
     }
   };
 
@@ -208,9 +208,9 @@ export const useAuthStore = defineStore('auth', () => {
         headers: { Authorization: `Bearer ${tokenInfo.accessToken}` },
       });
       return response.data;
-    } catch (err) {
-      console.error('참여자 상세 조회 실패:', err);
-      throw err;
+    } catch (error) {
+      console.error('참여자 상세 조회 실패:', error);
+      throw error;
     }
   };
 

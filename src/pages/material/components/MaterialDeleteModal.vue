@@ -6,11 +6,11 @@
   >
     <v-card>
       <v-card-title>자료 삭제</v-card-title>
-      <v-card-text> "{{ props.material?.title }}" 자료를 삭제하시겠습니까? </v-card-text>
+      <v-card-text> "{{ props.material?.title }}" 자료를 정말 삭제하시겠습니까? </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('update:modelValue', false)">취소</v-btn>
-        <v-btn color="red" @click="confirmDelete">삭제</v-btn>
+        <v-btn color="red" @click="confirmDelete">삭제하기</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

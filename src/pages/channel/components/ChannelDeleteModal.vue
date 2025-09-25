@@ -7,11 +7,11 @@
     <v-card>
       <v-card-title>채널 삭제</v-card-title>
       <v-card-text>
-        정말 <strong>{{ channel?.name }}</strong> 채널을 삭제하시겠습니까?
+        정말 <strong>{{ channel?.name }}</strong> 채널을 정말 삭제하시겠습니까?
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text @click="$emit('update:modelValue', false)">취소</v-btn>
+        <v-btn text @click="$emit('update:modelValue', false)">취소하기</v-btn>
         <v-btn color="red" @click="confirmDelete">삭제</v-btn>
       </v-card-actions>
     </v-card>

@@ -1,38 +1,55 @@
 <template>
   <div>
     <!-- 🔹 참여자 목록 -->
-    <v-card class="mb-4">
-      <v-card-title>참여자 목록</v-card-title>
-      <v-list dense>
-        <v-list-item v-for="user in participants" :key="user.userId">
-          <v-row class="w-100" align="center">
-            <!-- 텍스트 영역 -->
-            <v-col>
-              {{ user.name || user.userId }} / {{ user.email || user.userId }} / ({{
-                user.roleName
-              }})
-            </v-col>
 
-            <!-- 버튼 영역: 로그인한 사용자만 -->
-            <v-col
-              class="d-flex justify-end"
-              cols="auto"
-              v-if="user.userId === authStore.tokenInfo.userId && user.roleName !== 'TUTOR'"
-            >
-              <v-btn small color="#eeddff" @click="openUserInfo(user)">정보</v-btn>
-              <v-btn small color="#eeddff" @click="handleAction(user)">탈퇴</v-btn>
-            </v-col>
-          </v-row>
-        </v-list-item>
+    <v-sheet class="pa-4">
+      <!-- 제목 + 버튼 -->
+      <div class="d-flex align-center justify-space-between mb-3">
+        <h3 class="text-h6 font-weight-bold">참여자 목록</h3>
+        <v-btn
+          v-if="myRole === 'TUTOR'"
+          class="rounded-xl"
+          color="primary-button-1"
+          elevation="0"
+          @click="openDialog"
+          >초대 발송하기</v-btn
+        >
+      </div>
 
-        <v-list-item v-if="participants.length === 0">
-          <v-list-item-title class="text-grey"> 참여자가 없습니다. </v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-card>
+      <!-- 참여자 리스트 -->
+      <v-table class="mt-4">
+        <thead>
+          <tr>
+            <th class="text-left">이름</th>
+            <th class="text-left">이메일</th>
+            <th class="text-left">역할</th>
+            <th class="text-right">액션</th>
+          </tr>
+        </thead>
 
-    <!-- 🔹 초대발송 버튼 & 모달 -->
-    <v-btn color="#eeddff" @click="openDialog">초대발송</v-btn>
+        <tbody>
+          <!-- 참여자 목록 -->
+          <tr v-for="user in participants" :key="user.userId">
+            <td>{{ user.name || user.userId }}</td>
+            <td>{{ user.email || user.userId }}</td>
+            <td>{{ user.roleName }}</td>
+            <td class="text-right">
+              <template
+                v-if="user.userId === authStore.tokenInfo.userId && user.roleName !== 'TUTOR'"
+              >
+                <!-- <v-btn color="#eeddff" size="small" @click="openUserInfo(user)">정보</v-btn> -->
+                <v-btn color="#eeddff" size="small" @click="handleAction(user)">탈퇴</v-btn>
+              </template>
+            </td>
+          </tr>
+
+          <!-- 참여자가 없을 때 -->
+          <tr v-if="participants.length === 0">
+            <td class="text-grey text-center" colspan="4">참여자가 없습니다.</td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-sheet>
 
     <v-dialog v-model="dialog" max-width="500px">
       <v-card>
@@ -57,24 +74,24 @@
         <div v-else>
           <v-select
             v-model="selectedRoleId"
-            :items="roles"
+            hide-details
             item-title="name"
             item-value="id"
+            :items="roles"
             label="역할 선택"
             outlined
-            hide-details
           />
         </div>
 
         <v-card-actions class="justify-end">
-          <v-btn text @click="closeDialog">닫기</v-btn>
+          <v-btn text @click="closeDialog">취소</v-btn>
           <v-btn
             v-if="!invitationCode"
             color="primary"
             :disabled="!selectedRoleId"
             @click="sendInvitation"
           >
-            발송
+            발송하기
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -82,17 +99,18 @@
 
     <!-- 🔹 참여자 정보 모달 (조회 전용) -->
     <ChannelUserInfoModal
+      :channel-id="channel?.id || $route.params.channelId"
+      :user-id="selectedUserId"
       :visible="userInfoDialog"
-      :userId="selectedUserId"
-      :channelId="channel?.id || $route.params.channelId"
       @close="userInfoDialog = false"
     />
   </div>
 </template>
 
 <script>
+import { getChannel } from '@/apis/channel';
+import ChannelUserInfoModal from '@/pages/channel/components/ChannelUserInfoModal.vue';
 import { useAuthStore } from '@/stores/authStore';
-import ChannelUserInfoModal from '../channel/components/ChannelUserInfoModal.vue';
 
 export default {
   name: 'InviteDialog',
@@ -112,6 +130,7 @@ export default {
     return {
       dialog: false,
       selectedRoleId: null,
+      myRole: null,
       invitationCode: null,
       participants: [],
       roles: [
@@ -125,6 +144,7 @@ export default {
   },
   async mounted() {
     await this.loadParticipants();
+    await this.loadChannelRole();
   },
   methods: {
     async openDialog() {
@@ -134,8 +154,17 @@ export default {
       try {
         const channelId = this.$route.params.channelId;
         this.participants = await this.authStore.fetchParticipants(channelId);
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async loadChannelRole() {
+      try {
+        const channelId = this.$route.params.channelId;
+        const channelData = await getChannel(channelId);
+        this.myRole = channelData.roleName; // ✅ 내 역할 저장
+      } catch (error) {
+        console.error('채널 역할 조회 실패:', error);
       }
     },
     async sendInvitation() {
@@ -149,8 +178,8 @@ export default {
 
         this.selectedRoleId = null;
         await this.loadParticipants();
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
       }
     },
     closeDialog() {
@@ -163,11 +192,10 @@ export default {
 
         const channelId = this.$route.params.channelId;
         const response = await this.authStore.deleteSelfFromChannel(channelId);
-        console.log('참여자 삭제 성공:', response);
 
-        await this.loadParticipants();
-      } catch (err) {
-        console.error('참여자 삭제 실패:', err);
+        this.$router.replace('/channels');
+      } catch (error) {
+        console.error('참여자 삭제 실패:', error);
       }
     },
     openUserInfo(user) {

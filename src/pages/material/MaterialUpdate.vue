@@ -78,7 +78,7 @@
         <!-- 버튼 -->
         <div class="d-flex justify-end">
           <v-btn class="mr-2" variant="text" @click="goBack">취소</v-btn>
-          <v-btn color="primary" type="submit">수정</v-btn>
+          <v-btn color="primary" type="submit">수정하기</v-btn>
         </div>
       </v-form>
     </v-card>

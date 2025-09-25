@@ -172,6 +172,7 @@ async function handleUpdate(payload) {
 async function handleDelete() {
   if (!submission.value) return;
   await deleteSubmission(channelId, assignmentId, submission.value.submissionId);
+
   submission.value = null;
 }
 

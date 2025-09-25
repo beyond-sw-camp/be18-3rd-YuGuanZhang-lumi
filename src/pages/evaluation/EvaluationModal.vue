@@ -26,7 +26,7 @@
         <v-btn text @click="$emit('update:modelValue', false)">취소</v-btn>
 
         <v-btn color="primary" @click="submit">
-          {{ mode === 'create' ? '등록' : '수정' }}
+          {{ mode === 'create' ? '등록하기' : '수정하기' }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -35,11 +35,11 @@
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
         <v-card-title>평가 삭제</v-card-title>
-        <v-card-text>정말 평가를 삭제하시겠습니까?</v-card-text>
+        <v-card-text>평가를 정말 삭제하시겠습니까?</v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="deleteDialog = false">취소</v-btn>
-          <v-btn color="red" @click="confirmDelete">삭제</v-btn>
+          <v-btn color="red" @click="confirmDelete">삭제하기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

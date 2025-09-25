@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import Index from './Index.vue';
 import apiClient from '@/apis/apiClient';
+import Index from './Index.vue';
 
 export default {
   name: 'ChannelPage',

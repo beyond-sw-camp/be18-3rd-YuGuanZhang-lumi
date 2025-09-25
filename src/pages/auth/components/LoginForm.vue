@@ -19,7 +19,7 @@
         variant="outlined"
         @click:append-inner="togglePassword"
       />
-      <v-btn block color="deep-purple" type="submit">로그인</v-btn>
+      <v-btn block color="primary" type="submit">로그인</v-btn>
     </v-form>
   </div>
 </template>

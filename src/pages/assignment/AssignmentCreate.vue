@@ -82,7 +82,7 @@
         <!-- 버튼 -->
         <div class="d-flex justify-end">
           <v-btn class="mr-2" variant="text" @click="goBack">취소</v-btn>
-          <v-btn color="primary" type="submit">등록</v-btn>
+          <v-btn color="primary" type="submit">생성하기</v-btn>
         </div>
       </v-form>
     </v-card>
@@ -94,6 +94,7 @@ import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { createAssignment } from '@/apis/assignment';
 import { uploadFiles } from '@/apis/file';
+import formatDateTime from '@/utils/formatDateTime';
 
 const route = useRoute();
 const router = useRouter();
@@ -121,7 +122,7 @@ async function handleCreate() {
     const payload = {
       title: form.value.title,
       content: form.value.content,
-      deadlineAt: form.value.deadlineAt.replace('T', ' ') + ':00', // "yyyy-MM-dd HH:mm:ss" 맞추기
+      deadlineAt: formatDateTime(new Date(form.value.deadlineAt)),
       isEvaluation: form.value.evaluation,
       fileIds, // 파일 업로드 기능 구현 전까지는 빈 배열
     };

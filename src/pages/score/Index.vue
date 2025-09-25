@@ -16,7 +16,7 @@
 
     <!-- 등록 버튼 -->
     <div v-if="channel?.roleName === 'TUTOR'" class="d-flex justify-end mt-4">
-      <v-btn color="#ffe8ff" elevation="0" @click="openCreateModal">성적 등록하기</v-btn>
+      <v-btn color="primary" elevation="0" @click="openCreateModal">성적 등록하기</v-btn>
     </div>
 
     <!-- 데이터 테이블 -->
@@ -34,7 +34,7 @@
           </thead>
           <tbody>
             <tr v-for="row in flatData" :key="row.gradeId">
-              <td>{{ row.date.split(' ')[0] }}</td>
+              <td>{{ row.date }}</td>
               <td>{{ row.title }}</td>
               <td>{{ row.grade }}</td>
               <td>
@@ -55,8 +55,8 @@
                     </v-btn>
                   </template>
                   <v-list>
-                    <v-list-item class="text-button" @click="openEdit(row)">수정하기</v-list-item>
-                    <v-list-item class="text-button" @click="openDelete(row)">삭제하기</v-list-item>
+                    <v-list-item class="text-button" @click="openEdit(row)">수정</v-list-item>
+                    <v-list-item class="text-button" @click="openDelete(row)">삭제</v-list-item>
                   </v-list>
                 </v-menu>
               </td>
@@ -121,10 +121,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
+          <v-btn text @click="formDialog = false">취소</v-btn>
           <v-btn color="primary" @click="submitForm">
             {{ editingId ? '수정하기' : '등록하기' }}
           </v-btn>
-          <v-btn text @click="formDialog = false">취소</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -132,11 +132,12 @@
     <!-- 삭제 모달 -->
     <v-dialog v-model="deleteDialog" max-width="300px">
       <v-card>
-        <v-card-title>정말 삭제하시겠습니까?</v-card-title>
+        <v-card-title>성적 삭제</v-card-title>
+        <v-card-text>성적을 정말 삭제하시겠습니까?</v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="error" @click="confirmDelete">삭제하기</v-btn>
           <v-btn text @click="deleteDialog = false">취소</v-btn>
+          <v-btn color="error" @click="confirmDelete">삭제하기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -191,7 +192,7 @@ function getChartData(category) {
 
   if (category === '전체') {
     const allGrades = grades.value.flatMap(d => d.grades);
-    const labels = Array.from(new Set(allGrades.map(g => g.date.split(' ')[0]))).sort();
+    const labels = Array.from(new Set(allGrades.map(g => g.date))).sort();
 
     const datasets = grades.value.map(d => ({
       label: d.category,
@@ -209,7 +210,7 @@ function getChartData(category) {
   const categoryData = grades.value.find(d => d.category === category);
   if (!categoryData) return { labels: [], datasets: [] };
 
-  const labels = categoryData.grades.map(g => g.date.split(' ')[0]);
+  const labels = categoryData.grades.map(g => g.date);
   const dataset = {
     label: category,
     data: categoryData.grades.map(g => g.grade),
@@ -254,7 +255,7 @@ function openEdit(row) {
   editingId.value = row.gradeId;
   form.value = {
     grades: row.grade,
-    date: row.date.split(' ')[0],
+    date: row.date,
     title: row.title,
     category: row.category,
   };
@@ -266,15 +267,10 @@ async function submitForm() {
 
   if (!valid) return;
 
-  const payload = {
-    ...form.value,
-    date: `${form.value.date} 00:00:00`,
-  };
-
   try {
     await (editingId.value
-      ? useUpdateGrade(channelId, editingId.value, payload)
-      : useCreateGrade(channelId, payload));
+      ? useUpdateGrade(channelId, editingId.value, form.value)
+      : useCreateGrade(channelId, form.value));
     await useGetGrades(channelId);
   } catch (error) {
     console.error(editingId.value ? '수정 실패:' : '생성 실패:', error);
