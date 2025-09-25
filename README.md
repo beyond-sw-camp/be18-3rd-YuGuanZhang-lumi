@@ -14,7 +14,7 @@
 </table>
 
 # 2. 기술 스택
-✓Frontend
+✓ Frontend
 
 ![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white)
 ![Vuetify](https://img.shields.io/badge/Vuetify-1867C0?style=for-the-badge&logo=vuetify&logoColor=white)
@@ -129,6 +129,13 @@
   <summary>화면정의서</summary>
   <ul>
     <li><a href="https://www.figma.com/design/BplxILKmHUej23Tsun2o6N/2nd_Project?node-id=0-1" target="_blank">기능명세서</a></li>
+  </ul>
+</details>
+
+<details>
+  <summary>테스트 계획 및 결과 보고서</summary>
+  <ul>
+    <li><a href="https://docs.google.com/spreadsheets/d/1hU3ODNUjGjJ8DMJBtgb53_1PkK_MNOq-_kNV6GPlQLo/edit?gid=1382987188#gid=1382987188" target="_blank">FE 단위 테스트</a></li>
   </ul>
 </details>
 
@@ -305,10 +312,10 @@
   </tbody>
 </table>
 
-# 5. 시스템 아키텍처 및 기술적 특징
+# 6. 시스템 아키텍처 및 기술적 특징
 <img width="1050" height="761" alt="아키텍처 그림" src="https://github.com/user-attachments/assets/68a01ca8-8549-4f75-bd12-3c26ccf7c3b2" />
 
-# 6. 회고록
+# 7. 회고록
 | 이름                                    | 회고 내용                                           |
 |--------------|-----------------------------------------------------------------------------------------------------------------|
 |      김대의        |     |
