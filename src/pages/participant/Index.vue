@@ -10,6 +10,7 @@
           v-if="myRole === 'TUTOR'"
           class="rounded-xl"
           color="primary-button-1"
+          elevation="0"
           @click="openDialog"
           >초대 발송하기</v-btn
         >

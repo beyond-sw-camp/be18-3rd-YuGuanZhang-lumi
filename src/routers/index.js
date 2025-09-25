@@ -124,7 +124,7 @@ router.beforeEach(async to => {
   const authStore = useAuthStore();
 
   try {
-    if (authStore.tokenInfo.accessToken === '') {
+    if (!authStore.tokenInfo.accessToken) {
       await authStore.refreshAccessToken();
     }
 

@@ -70,6 +70,11 @@
             <v-col class="font-weight-bold" cols="2">이메일</v-col>
             <v-col cols="10">{{ authStore.tokenInfo.email }}</v-col>
           </v-row>
+          <v-row>
+            <v-col class="text-right">
+              <v-btn @click="deleted">회원탈퇴</v-btn>
+            </v-col>
+          </v-row>
         </v-container>
       </v-card-text>
     </v-card>
@@ -92,6 +97,17 @@ async function logout() {
   } catch (error) {
     console.error(error);
     alert('로그아웃 실패했습니다.');
+  }
+}
+
+async function deleted() {
+  try {
+    await authStore.deleted({ email: authStore.tokenInfo.email });
+    alert('회원탈퇴 되었습니다.');
+    router.push('/login');
+  } catch (error) {
+    console.error(error);
+    alert('회원탈퇴 실패했습니다.');
   }
 }
 

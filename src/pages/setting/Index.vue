@@ -5,8 +5,8 @@
     <div class="userInfoBox">
       <p><strong>이름:</strong> {{ authStore.tokenInfo.name }}</p>
       <p><strong>이메일:</strong> {{ authStore.tokenInfo.email }}</p>
-      <v-btn @click="deleted">회원탈퇴</v-btn>
     </div>
+    <div><v-spacer /><v-btn @click="deleted">회원탈퇴</v-btn></div>
   </div>
 </template>
 
