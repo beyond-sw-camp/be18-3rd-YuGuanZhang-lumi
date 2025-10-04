@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app color="primary" permanent>
+  <v-navigation-drawer app class="main-drawer" color="primary" permanent>
     <v-list color="primary">
       <v-list-item color="primary" link title="Lumi" to="/" />
       <v-divider />
@@ -34,11 +34,11 @@
     </template>
   </v-navigation-drawer>
 
-  <v-navigation-drawer permanent width="280">
+  <v-navigation-drawer color="primary-lighten-1" permanent width="280">
     <ChatRoomList />
   </v-navigation-drawer>
 
-  <v-app-bar app class="bg-primary-lighten-1" elevation="0">
+  <v-app-bar app class="bg-primary-lighten-3" elevation="0">
     <v-spacer />
     <span class="user-name">{{ userName }}</span>
     <v-btn variant="plain" @click="logout">로그아웃</v-btn>
@@ -132,9 +132,9 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.v-navigation-drawer,
-.v-navigation-drawer .v-list,
-.v-navigation-drawer .v-list-item {
+.main-drawer,
+.main-drawer .v-list,
+.main-drawer .v-list-item {
   background-color: rgb(var(--v-theme-primary)) !important;
   color: white !important;
 }

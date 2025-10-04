@@ -33,7 +33,7 @@
       </div>
     </template>
   </v-navigation-drawer>
-  <v-app-bar class="bg-primary-lighten-1" elevation="0">
+  <v-app-bar class="bg-primary-lighten-3" elevation="0">
     <v-spacer />
     <span class="user-name">{{ userName }}</span>
     <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>

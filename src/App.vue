@@ -1,5 +1,5 @@
 <template>
-  <v-app class="bg-primary-lighten-1">
+  <v-app class="bg-primary-lighten-3">
     <v-layout class="rounded rounded-md border">
       <component :is="layout">
         <component :is="subLayout">
