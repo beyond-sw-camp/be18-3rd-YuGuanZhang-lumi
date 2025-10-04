@@ -7,6 +7,8 @@
       </div>
     </v-list-item-title>
 
+    <Searchbar />
+
     <v-list-item
       v-for="room in chatRoomList"
       :key="room.roomId"
@@ -30,6 +32,7 @@
 import { onMounted, ref } from 'vue';
 import { getChatRooms } from '@/apis/chat';
 import { useApi } from '@/composable/useApi';
+import Searchbar from '@/pages/chat/components/Searchbar.vue';
 
 const chatRooms = ref([]);
 const { data: chatRoomList, queryFnExecute: useGetChatRooms } = useApi(getChatRooms);
