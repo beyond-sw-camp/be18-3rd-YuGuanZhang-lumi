@@ -12,6 +12,7 @@
 
 <script>
 import BlankLayout from '@/layouts/BlankLayout.vue';
+import ChatLayout from '@/layouts/ChatLayout.vue';
 import RootLayout from '@/layouts/RootLayout.vue';
 import Tab from '@/layouts/Tab.vue';
 
@@ -22,6 +23,9 @@ export default {
       switch (this.$route.meta.layout) {
         case 'root': {
           return RootLayout;
+        }
+        case 'chat': {
+          return ChatLayout;
         }
         case 'blank': {
           return BlankLayout;

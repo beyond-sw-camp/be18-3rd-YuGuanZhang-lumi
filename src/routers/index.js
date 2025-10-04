@@ -18,7 +18,7 @@ const routes = [
   { path: '/login', component: Login, meta: { layout: 'blank' } },
   { path: '/channels', component: () => import('@/pages/channel'), meta: { layout: 'root' } },
   { path: '/calendar', component: () => import('@/pages/calendar'), meta: { layout: 'root' } },
-  { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'root' } },
+  { path: '/chats', component: () => import('@/pages/chat'), meta: { layout: 'chat' } },
   { path: '/profile', component: () => import('@/pages/setting'), meta: { layout: 'root' } },
   {
     path: '/channels/:channelId/classes',

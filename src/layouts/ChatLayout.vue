@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer color="primary" permanent>
+  <v-navigation-drawer app color="primary" permanent>
     <v-list color="primary">
       <v-list-item color="primary" link title="Lumi" to="/" />
       <v-divider />
@@ -33,10 +33,15 @@
       </div>
     </template>
   </v-navigation-drawer>
-  <v-app-bar class="bg-primary-lighten-1" elevation="0">
+
+  <v-navigation-drawer permanent width="280">
+    <ChatRoomList />
+  </v-navigation-drawer>
+
+  <v-app-bar app class="bg-primary-lighten-1" elevation="0">
     <v-spacer />
     <span class="user-name">{{ userName }}</span>
-    <v-btn variant="plain" @click="logout"> 로그아웃 </v-btn>
+    <v-btn variant="plain" @click="logout">로그아웃</v-btn>
     <v-btn icon @click="profileDialog = true">
       <v-icon>mdi-account-cog-outline</v-icon>
     </v-btn>
@@ -44,7 +49,7 @@
 
   <v-main class="d-flex align-center justify-center">
     <v-container class="fill-height w-100" fluid>
-      <v-sheet class="rounded-xl fill-height w-100">
+      <v-sheet class="root-content rounded-xl fill-height w-100">
         <slot />
       </v-sheet>
     </v-container>
@@ -53,7 +58,7 @@
   <v-dialog v-model="profileDialog" max-width="400">
     <v-card>
       <v-card-title class="d-flex align-center">
-        <span> 프로필 정보 </span>
+        <span>프로필 정보</span>
         <v-spacer />
         <v-btn icon variant="text" @click="profileDialog = false">
           <v-icon>mdi-close</v-icon>
@@ -80,14 +85,18 @@
     </v-card>
   </v-dialog>
 </template>
+
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ChatRoomList from '@/pages/chat/components/ChatRoomList.vue';
 import { useAuthStore } from '@/stores/authStore';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const profileDialog = ref(false);
+
+const userName = computed(() => authStore.tokenInfo.name);
 
 async function logout() {
   try {
@@ -120,11 +129,9 @@ onMounted(async () => {
     }
   }
 });
-
-const userName = computed(() => authStore.tokenInfo.name);
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .v-navigation-drawer,
 .v-navigation-drawer .v-list,
 .v-navigation-drawer .v-list-item {
