@@ -24,6 +24,8 @@ const CustomLightTheme = {
     'surface-variant': '#424242',
     'on-surface-variant': '#EEEEEE',
     primary: '#D4AAFF',
+    'primary-button-1': '#ffe8ff',
+    'primary-button-2': '#ffe8ff',
     'primary-lighten-1': 'fbf7ff',
     'primary-darken-1': '#c791ff',
     secondary: '#A8E6CF',

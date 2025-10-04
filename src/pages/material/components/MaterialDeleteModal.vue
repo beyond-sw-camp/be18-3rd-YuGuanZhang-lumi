@@ -5,8 +5,8 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <v-card>
-      <v-card-title>과제 삭제</v-card-title>
-      <v-card-text> "{{ props.assignment?.title }}" 과제를 정말 삭제하시겠습니까? </v-card-text>
+      <v-card-title>자료 삭제</v-card-title>
+      <v-card-text> "{{ props.material?.title }}" 자료를 정말 삭제하시겠습니까? </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn text @click="$emit('update:modelValue', false)">취소</v-btn>
@@ -18,14 +18,14 @@
 
 <script setup>
 const props = defineProps({
-  assignment: { type: Object, default: null },
+  material: { type: Object, default: null },
   modelValue: { type: Boolean, required: true },
 });
 
 const emit = defineEmits(['update:modelValue', 'confirm']);
 
 function confirmDelete() {
-  emit('confirm', props.assignment);
+  emit('confirm', props.material);
   emit('update:modelValue', false);
 }
 </script>

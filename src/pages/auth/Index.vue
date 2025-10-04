@@ -57,10 +57,10 @@ function toggleForm() {
   isSignUpActive.value = !isSignUpActive.value;
 
   if (isSignUpActive.value) {
-    // 슬라이드 회원가입 폼 + URL만 /signup 으로 변경
+    // URL만 /signup으로 변경
     window.history.replaceState(history.state, '', '/signup');
   } else {
-    // 다시 로그인 폼 + URL만 /login 으로 변경
+    // URL만 /login으로 변경
     window.history.replaceState(history.state, '', '/login');
   }
 }
@@ -68,6 +68,7 @@ function toggleForm() {
 async function handleLogin(formData) {
   try {
     await authStore.login(formData);
+    console.log('로그인 후 accessToken:', authStore.tokenInfo.accessToken);
     router.push('/channels');
   } catch (error) {
     const backendMessage =

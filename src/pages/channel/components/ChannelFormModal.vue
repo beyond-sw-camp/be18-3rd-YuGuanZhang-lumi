@@ -37,6 +37,7 @@ const emit = defineEmits(['update:modelValue', 'submit']);
 const form = reactive({
   name: '',
   subject: '',
+  roleName: '',
 });
 
 // 채널 수정 시 초기값 세팅
@@ -45,6 +46,7 @@ watch(
   val => {
     form.name = props.mode === 'edit' && val ? val.name : '';
     form.subject = props.mode === 'edit' && val ? val.subject : '';
+    form.roleName = props.mode == 'edit' && val ? val.roleName : '';
   },
   { immediate: true },
 );

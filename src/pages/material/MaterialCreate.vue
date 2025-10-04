@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center">
     <v-card class="pa-6 rounded-xl shadow-lg" max-width="600" width="100%">
-      <v-card-title class="text-h5 font-weight-bold"> 과제 생성 </v-card-title>
+      <v-card-title class="text-h5 font-weight-bold"> 자료 등록 </v-card-title>
       <v-divider class="mb-4" />
 
       <v-form @submit.prevent="handleCreate">
@@ -10,7 +10,7 @@
           v-model="form.title"
           class="mb-4"
           density="comfortable"
-          label="과제 제목"
+          label="자료 제목"
           required
           variant="outlined"
         />
@@ -19,33 +19,10 @@
         <v-textarea
           v-model="form.content"
           class="mb-4"
-          label="과제 설명"
-          required
+          label="자료 설명"
           rows="4"
           variant="outlined"
         />
-
-        <!-- 마감일 -->
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="form.deadlineAt"
-              class="mb-4"
-              density="comfortable"
-              label="제출 마감일"
-              required
-              type="datetime-local"
-              variant="outlined"
-            />
-          </v-col>
-        </v-row>
-
-        <!-- 스위치 -->
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-switch v-model="form.evaluation" color="primary" inset label="평가 필요 여부" />
-          </v-col>
-        </v-row>
 
         <!-- 파일 업로드 -->
         <v-file-input
@@ -82,7 +59,7 @@
         <!-- 버튼 -->
         <div class="d-flex justify-end">
           <v-btn class="mr-2" variant="text" @click="goBack">취소</v-btn>
-          <v-btn color="primary" type="submit">생성하기</v-btn>
+          <v-btn color="primary" type="submit">등록</v-btn>
         </div>
       </v-form>
     </v-card>
@@ -92,51 +69,46 @@
 <script setup>
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { createAssignment } from '@/apis/assignment';
 import { uploadFiles } from '@/apis/file';
-import formatDateTime from '@/utils/formatDateTime';
+import { createMaterial } from '@/apis/material';
 
 const route = useRoute();
 const router = useRouter();
 
-// URL에서 채널ID 사용 (라우팅: /channels/:channelId/assignments/create)
 const channelId = route.params.channelId;
 
 const form = ref({
   title: '',
   content: '',
-  deadlineAt: '',
-  evaluation: false,
   files: [],
 });
 
-// 과제 생성
+// 자료 생성
 async function handleCreate() {
   try {
     let fileIds = [];
     if (form.value.files.length > 0) {
-      const uploaded = await uploadFiles('ASSIGNMENT', form.value.files);
+      const uploaded = await uploadFiles('MATERIAL', form.value.files);
       fileIds = uploaded.map(f => f.fileId);
     }
-    // API에 맞는 payload 만들기
+
+    // API에 맞는 payload
     const payload = {
       title: form.value.title,
       content: form.value.content,
-      deadlineAt: formatDateTime(new Date(form.value.deadlineAt)),
-      isEvaluation: form.value.evaluation,
-      fileIds, // 파일 업로드 기능 구현 전까지는 빈 배열
+      fileIds,
     };
 
-    await createAssignment(channelId, payload);
+    await createMaterial(channelId, payload);
 
-    router.push(`/channels/${channelId}/assignments`);
+    router.push(`/channels/${channelId}/materials`);
   } catch (error) {
-    console.error('과제 생성 실패:', error);
+    console.error('자료 생성 실패:', error);
   }
 }
 
 function goBack() {
-  router.push(`/channels/${channelId}/assignments`);
+  router.push(`/channels/${channelId}/materials`);
 }
 
 function removeFile(index) {
@@ -145,6 +117,7 @@ function removeFile(index) {
   form.value.files = next;
 }
 </script>
+
 <style scoped>
 .file-list {
   padding-left: 16px;
