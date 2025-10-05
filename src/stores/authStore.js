@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { reactive } from 'vue';
 // stores/authStore.js
 import apiClient from '@/apis/apiClient';
+import { defineStore } from 'pinia';
+import { reactive } from 'vue';
 
 export const useAuthStore = defineStore('auth', () => {
   // --- 상태 초기화 ---
@@ -214,6 +214,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  // 비밀번호 변경
+
+  const updatePassword = async ({ password, newPassword }) => {
+    try {
+      const response = await apiClient.patch('/user/update', {
+        password,
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('비밀번호 변경 오류', error);
+      throw error;
+    }
+  };
+
   return {
     tokenInfo,
     setAccessToken,
@@ -229,5 +244,6 @@ export const useAuthStore = defineStore('auth', () => {
     fetchParticipants,
     deleteSelfFromChannel,
     fetchChannelUser,
+    updatePassword,
   };
 });

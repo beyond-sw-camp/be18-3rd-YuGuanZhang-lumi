@@ -70,12 +70,33 @@
             <v-col class="font-weight-bold" cols="2">이메일</v-col>
             <v-col cols="10">{{ authStore.tokenInfo.email }}</v-col>
           </v-row>
-          <v-row>
-            <v-col class="text-right">
+          <v-row class="mb-2" justify="end">
+            <v-col class="text-right" cols="auto">
+              <v-btn @click="openUpdateDialog">비밀번호 변경</v-btn>
+            </v-col>
+            <v-col class="text-right" cols="auto">
               <v-btn @click="deleted">회원탈퇴</v-btn>
             </v-col>
           </v-row>
         </v-container>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <!-- 비밀번호 변경 모달창 -->
+  <v-dialog v-model="updateDialog" max-width="400">
+    <v-card>
+      <v-card-title class="d-flex align-center">
+        <span>비밀번호 변경</span>
+        <v-spacer />
+        <v-btn icon variant="text" @click="updateDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+
+      <v-card-text>
+        <v-text-field v-model="password" label="현재 비밀번호" type="password"></v-text-field>
+        <v-text-field v-model="newPassword" label="새 비밀번호" type="password"></v-text-field>
+        <v-btn color="primary" block @click="changePassword">변경하기</v-btn>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -84,10 +105,42 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
+import { nextTick } from 'vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
 const profileDialog = ref(false);
+// 비밀번호 변경
+const updateDialog = ref(false);
+const password = ref('');
+const newPassword = ref('');
+
+function openUpdateDialog() {
+  profileDialog.value = false;
+  updateDialog.value = true;
+}
+
+async function changePassword() {
+  try {
+    await authStore.updatePassword({
+      password: password.value,
+      newPassword: newPassword.value,
+    });
+    alert('비밀번호가 변경되었습니다.');
+    // 1. 토큰 초기화
+    authStore.performLogout();
+
+    // 2. 모달 닫기
+    updateDialog.value = false;
+    profileDialog.value = false;
+
+    // 3. 로그인 페이지로 이동
+    router.replace('/login'); // replace를 쓰면 히스토리 쌓이지 않음
+  } catch (error) {
+    const message = error.response?.data?.message || '비밀번호 변경 실패';
+    alert(message);
+  }
+}
 
 async function logout() {
   try {
