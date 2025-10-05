@@ -20,10 +20,14 @@
         </div>
 
         <v-row class="my-1 ga-1" :justify="chat.senderId === userId ? 'end' : 'start'" no-gutters>
-          <v-col v-if="chat.senderId !== userId && shouldShowAvatar(index)" cols="auto">
-            <v-avatar class="bg-grey-lighten-3 text-caption text-grey" size="36">
-              {{ chat.senderName?.[0] }}
-            </v-avatar>
+          <v-col v-if="chat.senderId !== userId" cols="auto">
+            <template v-if="shouldShowAvatar(index)">
+              <v-avatar class="bg-grey-lighten-3 text-caption text-grey" size="36">
+                {{ chat.senderName?.[0] }}
+              </v-avatar>
+            </template>
+
+            <div v-else class="avatar-spacer"></div>
           </v-col>
 
           <v-col class="message" cols="auto">
@@ -121,6 +125,12 @@ watch(
   white-space: nowrap;
   padding: 0 10px;
   border-radius: 8px;
+}
+
+.avatar-spacer {
+  width: 36px;
+  height: 36px;
+  visibility: hidden;
 }
 
 .message {
