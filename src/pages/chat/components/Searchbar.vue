@@ -55,8 +55,6 @@ const debouncedQuery = useDebounce(query, 300); // 💫 디바운스 훅 적용
 const searchResults = ref([]);
 const showDropdown = ref(false);
 
-console.log(searchResults);
-
 // 검색어가 변경될 때마다 API 호출
 watch(debouncedQuery, async val => {
   if (!val?.trim()) {
@@ -87,14 +85,6 @@ function selectUser(user) {
   background-color: white !important;
   border-radius: 8px;
   padding: 4px 8px;
-}
-
-.search-input .v-field__input {
-  padding: 0 !important;
-}
-
-.search-input .v-field__field {
-  padding: 0 !important;
 }
 
 .result-dropdown {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // src/composable/useDebounce.js
 import { onBeforeUnmount, ref, watch } from 'vue';
 

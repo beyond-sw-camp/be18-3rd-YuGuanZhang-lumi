@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken: localStorage.getItem('refreshToken') || null,
     name: '',
     email: '',
+    userId: null,
   });
 
   // --- accessToken 설정 ---
@@ -24,6 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
     tokenInfo.refreshToken = null;
     tokenInfo.name = '';
     tokenInfo.email = '';
+    tokenInfo.userId = null;
     localStorage.removeItem('refreshToken');
     delete apiClient.defaults.headers['Authorization'];
   };
@@ -43,6 +45,7 @@ export const useAuthStore = defineStore('auth', () => {
         setAccessToken(response.data.accessToken);
         tokenInfo.refreshToken = response.data.refreshToken;
         localStorage.setItem('refreshToken', tokenInfo.refreshToken);
+        await fetchProfile();
       }
     } catch (error) {
       console.error('Refresh token failed', error);
@@ -69,6 +72,7 @@ export const useAuthStore = defineStore('auth', () => {
 
         tokenInfo.refreshToken = data.refreshToken;
         localStorage.setItem('refreshToken', data.refreshToken);
+        await fetchProfile();
 
         return response.data;
       }

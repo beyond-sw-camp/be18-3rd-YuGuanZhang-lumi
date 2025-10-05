@@ -1,9 +1,9 @@
 <template>
-  <div></div>
+  <ChatRoom />
 </template>
 
-<script>
-export default {};
+<script setup>
+import ChatRoom from '@/pages/chat/components/ChatRoom.vue';
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

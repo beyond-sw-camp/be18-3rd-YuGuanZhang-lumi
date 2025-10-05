@@ -14,6 +14,7 @@
       :key="room.roomId"
       :subtitle="room.lastMessage"
       :title="room.roomName"
+      @click="openChatRoom(room.roomId)"
     >
       <template #prepend>
         <v-avatar class="d-flex align-center justify-center font-weight-bold bg-white" size="36">
@@ -29,13 +30,19 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { getChatRooms } from '@/apis/chat';
 import { useApi } from '@/composable/useApi';
 import Searchbar from '@/pages/chat/components/Searchbar.vue';
 
-const chatRooms = ref([]);
+const router = useRouter();
+
 const { data: chatRoomList, queryFnExecute: useGetChatRooms } = useApi(getChatRooms);
+
+function openChatRoom(roomId) {
+  router.push({ path: '/chats', query: { roomId } });
+}
 
 onMounted(async () => {
   await useGetChatRooms();
