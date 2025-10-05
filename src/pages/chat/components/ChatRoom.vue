@@ -1,5 +1,5 @@
 <template>
-  <v-container class="chat-container" fluid>
+  <v-container class="chat-room-container" fluid>
     <v-row
       v-if="chatList.length === 0"
       align="center"
@@ -14,29 +14,19 @@
     <template v-else>
       <template v-for="(chat, index) in chatList" :key="chat.chatId">
         <div v-if="showDateSeparator(index)" class="date-separator">
-          <v-divider class="flex-grow-1" />
+          <v-divider class="my-3" />
           <span>{{ formatDate(new Date(chat.createdAt)) }}</span>
-          <v-divider class="flex-grow-1" />
+          <v-divider class="my-3" />
         </div>
 
-        <v-row
-          class="my-1 align-start"
-          :justify="chat.senderId === userId ? 'end' : 'start'"
-          no-gutters
-        >
-          <v-col
-            v-if="chat.senderId !== userId && shouldShowAvatar(index)"
-            class="pe-2 avatar-col"
-            cols="auto"
-          >
-            <div class="avatar-wrapper">
-              <v-avatar class="bg-grey-lighten-3 text-caption text-grey" size="36">
-                {{ chat.senderName?.[0] }}
-              </v-avatar>
-            </div>
+        <v-row class="my-1 ga-1" :justify="chat.senderId === userId ? 'end' : 'start'" no-gutters>
+          <v-col v-if="chat.senderId !== userId && shouldShowAvatar(index)" cols="auto">
+            <v-avatar class="bg-grey-lighten-3 text-caption text-grey" size="36">
+              {{ chat.senderName?.[0] }}
+            </v-avatar>
           </v-col>
 
-          <v-col class="d-flex flex-column align-start message-col" cols="auto">
+          <v-col class="message" cols="auto">
             <v-card
               class="pa-2 px-3 rounded-xl"
               :class="chat.senderId === userId ? 'text-white my-bubble' : 'text-black other-bubble'"
@@ -44,7 +34,6 @@
             >
               <div class="text-body-2">{{ chat.message }}</div>
             </v-card>
-
             <div
               class="text-caption text-grey mt-1"
               :class="chat.senderId === userId ? 'text-end' : 'text-start'"
@@ -87,24 +76,17 @@ const chatList = computed(() => {
 
 function showDateSeparator(index) {
   const list = chatList.value;
-  if (list.length === 0) return false;
   if (index === 0) return true;
-
   const prev = list[index - 1];
   const curr = list[index];
   if (!prev?.createdAt || !curr?.createdAt) return false;
-
-  const prevDate = new Date(prev.createdAt);
-  const currDate = new Date(curr.createdAt);
-  return prevDate.toDateString() !== currDate.toDateString();
+  return new Date(prev.createdAt).toDateString() !== new Date(curr.createdAt).toDateString();
 }
 
 function shouldShowAvatar(index) {
   if (index === 0) return true;
   const list = chatList.value;
-  const prev = list[index - 1];
-  const curr = list[index];
-  return prev?.senderId !== curr?.senderId;
+  return list[index - 1]?.senderId !== list[index]?.senderId;
 }
 
 watch(
@@ -118,10 +100,12 @@ watch(
 </script>
 
 <style scoped>
-.chat-container {
-  height: calc(100vh - 200px);
+.chat-room-container {
+  height: 100%;
   overflow-y: auto;
-  padding: 16px;
+  background-color: #fafafa;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 }
 
 .date-separator {
@@ -139,24 +123,8 @@ watch(
   border-radius: 8px;
 }
 
-.avatar-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.avatar-wrapper {
-  display: flex;
-  align-items: flex-start;
-}
-
 .message {
   max-width: 70%;
-}
-
-.message-col {
-  display: flex;
-  flex-direction: column;
 }
 
 .my-bubble {
